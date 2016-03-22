@@ -91,6 +91,9 @@ export
 	ln -fs $(KALDI_ROOT)/egs/sre08/v1/sid
 	mkdir -p src-audio
 
+build/audio/base/%.wav: src-audio/%.sph
+	mkdir -p `dirname $@`
+	sox $^ -c 1 build/audio/base/$*.wav rate -v 16k
 
 build/audio/base/%.wav: src-audio/%.wav
 	mkdir -p `dirname $@`
@@ -191,17 +194,15 @@ build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	ln -s $(GRAPH_DIR) `pwd`/build/trans/$*/eesen/graph
 	steps/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --beam 17.0 \
 	--lattice_beam 8.0 --max-active 5000 --skip_scoring true \
-	--acwt 0.6 $(GRAPH_DIR) build/trans/$* `dirname $@` || exit 1;
+	--acwt 0.7 $(GRAPH_DIR) build/trans/$* `dirname $@` || exit 1;
 
-# Florian - final output
-# make build/trans_swbd/S2L_Jan_2014_2111480523c0140915/tri4a/decode/.ctm
-
-# use this file as input exp_pdnn/dnn_fbank/%/scoring/test_filt.txt
-
-#e.g. make build/trans/myvideo/eesen/decode/.ctm
+# scoring can happen here now, get_ctm_conf.sh only scores if -f build/trans/$*/stm
+# produces confidence scores
+# e.g. make build/trans/myvideo/eesen/decode/.ctm
 # % = build/trans/myvideo/eesen
 %/decode/.ctm: %/decode/log
 	local/get_ctm.sh `dirname $*` $*/graph $*/decode
+#	local/get_ctm_conf.sh `dirname $*` $*/graph $*/decode
 	touch -m $@
 
 # % = myvideo/eesen
