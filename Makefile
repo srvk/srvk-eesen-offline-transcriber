@@ -201,8 +201,8 @@ build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 # e.g. make build/trans/myvideo/eesen/decode/.ctm
 # % = build/trans/myvideo/eesen
 %/decode/.ctm: %/decode/log
-	local/get_ctm.sh `dirname $*` $*/graph $*/decode
-#	local/get_ctm_conf.sh `dirname $*` $*/graph $*/decode
+#	local/get_ctm.sh `dirname $*` $*/graph $*/decode
+	local/get_ctm_conf.sh `dirname $*` $*/graph $*/decode
 	touch -m $@
 
 # % = myvideo/eesen
