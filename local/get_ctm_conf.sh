@@ -76,28 +76,17 @@ fi
 
 # Score the set...
 if [ $stage -le 2 ]; then
+  # filter the stm to look like it came from transcriber
+  # filter skipped lines and convert {space apostrophe} to space
+  grep -v "inter_segment_gap" $data/stm | sed -e "s/ '/'/g" > $data/stm.filt
+  # make an stm file with labels that match transcriber's (use wav.scp first column)
+  cat $data/wav.scp | awk '{print $1}' > $data/wav.cut
+  cat $data/stm.filt | cut -d ' ' -f 2- > $data/stm.cut
+  paste -d ' ' $data/wav.cut $data/stm.cut > $data/stm.trans
+
   $cmd ACWT=$min_acwt:$max_acwt $dir/scoring/log/score.ACWT.log \
-    cp $data/stm $dir/score_ACWT/ '&&' \
+    cp $data/stm.trans $dir/score_ACWT/stm '&&' \
     $hubscr -p $hubdir -V -l english -h hub5 -g $data/glm -r $dir/score_ACWT/stm $dir/score_ACWT/${name}.ctm || exit 1;
 fi
-
-# For eval2000 score the subsets
-case "$name" in eval2000* )
-  # Score only the, swbd part...
-  if [ $stage -le 3 ]; then
-    $cmd ACWT=$min_acwt:$max_acwt $dir/scoring/log/score.swbd.ACWT.log \
-      grep -v '^en_' $data/stm '>' $dir/score_ACWT/stm.swbd '&&' \
-      grep -v '^en_' $dir/score_ACWT/${name}.ctm '>' $dir/score_ACWT/${name}.ctm.swbd '&&' \
-      $hubscr -p $hubdir -V -l english -h hub5 -g $data/glm -r $dir/score_ACWT/stm.swbd $dir/score_ACWT/${name}.ctm.swbd || exit 1;
-  fi
-  # Score only the, callhome part...
-  if [ $stage -le 3 ]; then
-    $cmd ACWT=$min_acwt:$max_acwt $dir/scoring/log/score.callhm.ACWT.log \
-      grep -v '^sw_' $data/stm '>' $dir/score_ACWT/stm.callhm '&&' \
-      grep -v '^sw_' $dir/score_ACWT/${name}.ctm '>' $dir/score_ACWT/${name}.ctm.callhm '&&' \
-      $hubscr -p $hubdir -V -l english -h hub5 -g $data/glm -r $dir/score_ACWT/stm.callhm $dir/score_ACWT/${name}.ctm.callhm || exit 1;
-  fi
- ;;
-esac
 
 exit 0;
