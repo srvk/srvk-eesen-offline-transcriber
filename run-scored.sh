@@ -6,7 +6,7 @@
 # 
 
 if [ $# -ne 1 ]; then
-  echo "Usage: run-segmented.sh <basename>"
+  echo "Usage: run-scored.sh <basename>"
   echo "where <basename> is the basename of files somewhere with"
   echo "extensions .stm and .sph"
   echo
@@ -27,7 +27,7 @@ mkdir -p build/diarization/$basename
 # make segments from $1.stm
 grep -v "inter_segment_gap" $dirname/$basename.stm | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U S1"}' > build/diarization/$basename/show.seg
 
-make build/trans/$basename/wav.scp
+make SEGMENTS=show.seg build/trans/$basename/wav.scp
 
 cp $dirname/$basename.stm build/trans/$basename/stm
 cp glm build/trans/$basename
