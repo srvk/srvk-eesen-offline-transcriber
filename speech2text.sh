@@ -50,6 +50,8 @@ fi
 
 (cd $BASEDIR; make $nthreads_arg $nnet2_online_arg build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels} || exit 1; if $clean ; then make .${basename%.*}.clean; fi)
 
+rm $BASEDIR/src-audio/$filename
+
 echo "Finished transcribing, result is in files $BASEDIR/build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels}"
 
 if [ ! -z $txt ]; then
