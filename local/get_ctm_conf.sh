@@ -22,7 +22,7 @@ echo "$0 $@"  # Print the command line for logging
 . parse_options.sh || exit 1;
 
 if [ $# -ne 3 ]; then
-  echo "Usage: local/score.sh [--cmd (run.pl|queue.pl...)] <data-dir> <lang-dir|graph-dir> <decode-dir>"
+  echo "Usage: local/get_ctm_conf.sh [--cmd (run.pl|queue.pl...)] <data-dir> <lang-dir|graph-dir> <decode-dir>"
   echo " Options:"
   echo "    --cmd (run.pl|queue.pl...)      # specify how to run the sub-processes."
   echo "    --min_acwt <int>                # minumum LM-weight for lattice rescoring "
