@@ -21,6 +21,8 @@ basename="${filename%.*}"
 
 mkdir -p build/audio/base
 sox $dirname/$basename.sph -c 1 build/audio/base/$basename.wav rate -v 16k
+# 8k
+# sox $dirname/$basename.sph -c 1 -e signed-integer build/audio/base/$basename.wav rate -v 8k
 
 mkdir -p build/diarization/$basename
 
