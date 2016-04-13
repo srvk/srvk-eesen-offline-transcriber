@@ -93,50 +93,50 @@ export
 
 build/audio/base/%.wav: src-audio/%.sph
 	mkdir -p `dirname $@`
-	sox $^ -c 1 build/audio/base/$*.wav rate -v 16k
+	sox $^ build/audio/base/$*.wav rate -v $(sample_rate) channels 1
 
 build/audio/base/%.wav: src-audio/%.wav
 	mkdir -p `dirname $@`
-	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v 16k
+	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp3
 	mkdir -p `dirname $@`
-	sox $^ -c 1 build/audio/base/$*.wav rate -v 16k
+	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.ogg
 	mkdir -p `dirname $@`
-	sox $^ -c 1 build/audio/base/$*.wav rate -v 16k
+	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp2
 	mkdir -p `dirname $@`
-	sox $^ -c 1 build/audio/base/$*.wav rate -v 16k
+	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.m4a
 	mkdir -p `dirname $@`
-	avconv -i $^ -ac 1 -ar 16k -y $@
-#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 $@ rate -v 16k
+	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@
+#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 $@ rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp4
 	mkdir -p `dirname $@`
-#	sox $^ -c 1 build/audio/base/$*.wav rate -v 16k
-	avconv -i $^ -ac 1 -ar 16k -y $@ 
+#	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@ 
 	echo "converted audio"
 	date +%s%N | cut -b1-13
 
 build/audio/base/%.wav: src-audio/%.flac
 	mkdir -p `dirname $@`
-	sox $^ -c 1 build/audio/base/$*.wav rate -v 16k
+	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.amr
 	mkdir -p `dirname $@`
 	amrnb-decoder $^ $@.tmp.raw
-	sox -s -2 -c 1 -r 8000 $@.tmp.raw -c 1 build/audio/base/$*.wav rate -v 16k
+	sox -s -2 -c 1 -r 8000 $@.tmp.raw -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 	rm $@.tmp.raw
 
 build/audio/base/%.wav: src-audio/%.mpg
 	mkdir -p `dirname $@`
-	avconv -i $^ -f sox - | sox -t sox - -c 1 -2 build/audio/base/$*.wav rate -v 16k
-#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 build/audio/base/$*.wav rate -v 16k
+	avconv -i $^ -f sox - | sox -t sox - -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
+#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
 
 # Speaker diarization
 build/diarization/%/$(SEGMENTS): build/audio/base/%.wav
@@ -178,7 +178,7 @@ build/trans/%/spk2utt: build/trans/%/utt2spk
 #   note the % pattern matches e.g. myvideo
 build/trans/%/fbank: build/trans/%/spk2utt
 	rm -rf $@
-	steps/make_fbank.sh --fbank-config conf/fbank.conf --cmd "$$train_cmd" --nj 1 \
+	steps/$(fbank).sh --fbank-config conf/fbank.$(sample_rate).conf --cmd "$$train_cmd" --nj 1 \
 		build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
 	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
 	echo "feature generation done"
@@ -194,7 +194,7 @@ build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	ln -s $(GRAPH_DIR) `pwd`/build/trans/$*/eesen/graph
 	steps/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --beam 17.0 \
 	--lattice_beam 8.0 --max-active 5000 --skip_scoring true \
-	--acwt 0.7 $(GRAPH_DIR) build/trans/$* `dirname $@` || exit 1;
+	--acwt $(ACWT) $(GRAPH_DIR) build/trans/$* `dirname $@` || exit 1;
 
 # scoring can happen here now, get_ctm_conf.sh only scores if -f build/trans/$*/stm
 # produces confidence scores
