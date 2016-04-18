@@ -93,7 +93,7 @@ export
 
 build/audio/base/%.wav: src-audio/%.sph
 	mkdir -p `dirname $@`
-	sox $^ build/audio/base/$*.wav rate -v $(sample_rate) channels 1
+	sox $^ build/audio/base/$*.wav rate -v $(sample_rate) #channels 1
 
 build/audio/base/%.wav: src-audio/%.wav
 	mkdir -p `dirname $@`
@@ -157,13 +157,19 @@ build/audio/segmented/%: build/diarization/%/$(SEGMENTS)
 		len=`echo $$LINE | cut -f 2 -d " " | perl -npe '$$_=$$_/100.0'`; \
 		sp_id=`echo $$LINE | cut -f 3 -d " "`; \
 		timeformatted=`echo "$$start $$len" | perl -ne '@t=split(); $$start=$$t[0]; $$len=$$t[1]; $$end=$$start+$$len; printf("%08.3f-%08.3f\n", $$start,$$end);'` ; \
-		sox build/audio/base/$*.wav --norm $@/$*_$${timeformatted}_$${sp_id}.wav trim $$start $$len ; \
+		if [ $${sp_id} == 'A' ]; then \
+			sox build/audio/base/$*.wav -c 1  $@/$*_$${timeformatted}_$${sp_id}.wav trim $$start $$len remix 1; \
+		elif [ $${sp_id} == 'B' ]; then \
+			sox build/audio/base/$*.wav -c 1  $@/$*_$${timeformatted}_$${sp_id}.wav trim $$start $$len remix 2; \
+		else \
+			sox build/audio/base/$*.wav --norm $@/$*_$${timeformatted}_$${sp_id}.wav trim $$start $$len; \
+		fi \
 	done
 
 build/trans/%/wav.scp: build/audio/segmented/%
 	mkdir -p `dirname $@`
 	/bin/ls $</*.wav  | \
-		perl -npe 'chomp; $$orig=$$_; s/.*\/(.*)_(\d+\.\d+-\d+\.\d+)_(S\d+)\.wav/\1-\3---\2/; $$_=$$_ .  " $$orig\n";' | LC_ALL=C sort > $@
+		perl -npe 'chomp; $$orig=$$_; s/.*\/(.*)_(\d+\.\d+-\d+\.\d+)_(.*)\.wav/\1-\3---\2/; $$_=$$_ .  " $$orig\n";' | LC_ALL=C sort > $@
 
 build/trans/%/utt2spk: build/trans/%/wav.scp
 	cat $^ | perl -npe 's/\s+.*//; s/((.*)---.*)/\1 \2/' > $@
@@ -208,7 +214,8 @@ build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 # % = myvideo/eesen
 # e.g. make build/trans/myvideo/eesen.segmented.splitw2.ctm
 build/trans/%.segmented.splitw2.ctm: build/trans/%/decode/.ctm
-	cat build/trans/$*/decode/score_$(LM_SCALE)/`dirname $*`.ctm | perl -npe 's/(.*)-(S\d+)---(\S+)/\1_\3_\2/' > $@
+#	cat build/trans/$*/decode/score_$(LM_SCALE)/`dirname $*`.ctm | perl -npe 's/(.*)-(S\d+)---(\S+)/\1_\3_\2/' > $@
+	cat build/trans/$*/decode/score_$(LM_SCALE)/`dirname $*`.ctm | perl -npe 's/(.*)-(\w+)---(\S+)/\1_\3_\2/' > $@
 
 
 #build/trans/myvideo/eesen.segmented.splitw2.ctm -> build/trans/myvideo/eesen.segmented.with-compounds.ctm
