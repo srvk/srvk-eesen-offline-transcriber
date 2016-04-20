@@ -196,11 +196,10 @@ build/trans/%/fbank: build/trans/%/spk2utt
 #	make build/trans/myvideo/eesen/decode/log
 build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	rm -rf build/trans/$*/eesen && mkdir -p build/trans/$*/eesen
-	(cd build/trans/$*/eesen; for f in $(MODEL_DIR)/*; do ln -s $$f; done)
-	ln -s $(GRAPH_DIR) `pwd`/build/trans/$*/eesen/graph
-	steps/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --beam 17.0 \
+#	(cd build/trans/$*/eesen; for f in $(MODEL_DIR)/*; do ln -s $$f; done)
+	steps/decode_ctc_lat_model.sh --cmd "$$decode_cmd" --nj $(njobs) --beam 17.0 \
 	--lattice_beam 8.0 --max-active 5000 --skip_scoring true \
-	--acwt $(ACWT) $(GRAPH_DIR) build/trans/$* `dirname $@` || exit 1;
+	--acwt $(ACWT) $(GRAPH_DIR) build/trans/$* `dirname $@` $(MODEL_DIR) || exit 1;
 
 # scoring can happen here now, get_ctm_conf.sh only scores if -f build/trans/$*/stm
 # produces confidence scores
@@ -208,7 +207,8 @@ build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 # % = build/trans/myvideo/eesen
 %/decode/.ctm: %/decode/log
 #	local/get_ctm.sh `dirname $*` $*/graph $*/decode
-	local/get_ctm_conf.sh `dirname $*` $*/graph $*/decode
+#	local/get_ctm_conf.sh `dirname $*` $*/graph $*/decode
+	local/get_ctm_conf.sh `dirname $*` $(GRAPH_DIR) $*/decode
 	touch -m $@
 
 # % = myvideo/eesen
