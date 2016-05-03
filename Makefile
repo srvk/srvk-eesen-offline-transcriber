@@ -143,7 +143,7 @@ build/diarization/%/$(SEGMENTS): build/audio/base/%.wav
 	rm -rf `dirname $@`
 	mkdir -p `dirname $@`
 	echo "$* 1 0 1000000000 U U U 1" >  `dirname $@`/show.uem.seg;
-	./scripts/diarization.sh $^ `dirname $@`/show.uem.seg;
+	./scripts/diarization.sh $^ `dirname $@`/show.uem.seg $(SEGMENTS);
 	echo "diarization complete"
 	date +%s%N | cut -b1-13
 

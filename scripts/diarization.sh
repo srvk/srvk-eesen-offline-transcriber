@@ -4,6 +4,7 @@ set -o errexit
 
 if [ -z $LOCALCLASSPATH ]; then
 	LOCALCLASSPATH=lib/LIUM_SpkDiarization-4.2.jar
+#	LOCALCLASSPATH=lib/LIUM_SpkDiarization-8.4.1.jar
 fi
 
 #turn off tracing
@@ -100,6 +101,11 @@ $java -Xmx1024m -classpath "$LOCALCLASSPATH" fr.lium.spkDiarization.programs.MDe
 $java -Xmx1024m -classpath "$LOCALCLASSPATH" fr.lium.spkDiarization.programs.MSeg  $trace --help \
  --kind=FULL --sMethod=GLR  --fInputMask=$features --fInputDesc=$fInputDesc --sInputMask=./$datadir/show.i.seg \
 --sOutputMask=./$datadir/show.s.seg  $show
+
+# save time; skip remaining steps
+if [ $3 == "show.s.seg" ]; 
+  then exit;
+fi
  
 # Linear clustering, fuse consecutive segments of the same speaker from the start to the end
 $java -Xmx1024m -classpath "$LOCALCLASSPATH" fr.lium.spkDiarization.programs.MClust  $trace --help \
