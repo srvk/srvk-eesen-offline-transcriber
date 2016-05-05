@@ -82,7 +82,8 @@ if [ $stage -le 2 ]; then
   # make an stm file with labels that match transcriber's (use wav.scp first column)
   cat $data/wav.scp | awk '{print $1}' > $data/wav.cut
   cat $data/stm.filt | cut -d ' ' -f 2- > $data/stm.cut
-  paste -d ' ' $data/wav.cut $data/stm.cut > $data/stm.trans
+  sort -k1,1 -k3n $data/stm.cut > $data/stm.sort
+  paste -d ' ' $data/wav.cut $data/stm.sort > $data/stm.trans
 
   $cmd ACWT=$min_acwt:$max_acwt $dir/scoring/log/score.ACWT.log \
     cp $data/stm.trans $dir/score_ACWT/stm '&&' \
