@@ -6,11 +6,10 @@
 # 
 
 if [ $# -ne 1 ]; then
-  echo "Usage: run-scored.sh <basename>"
-  echo "where <basename> is the basename of files somewhere with"
-  echo "extensions .stm and .sph"
+  echo "Usage: run-scored.sh <file>"
+  echo "where <file> may have extension like .sph .wav .mp3"
   echo
-  echo "./run-scored.sh /vagrant/GaryFlake_2010.stm"
+  echo "./run-scored.sh /vagrant/GaryFlake_2010.wav"
   exit 1;
 fi
 
@@ -20,14 +19,15 @@ extension="${filename##*.}"
 basename="${filename%.*}"
 
 mkdir -p build/audio/base
-sox $dirname/$basename.sph -c 1 build/audio/base/$basename.wav rate -v 16k
+
+sox $1 -c 1 build/audio/base/$basename.wav rate -v 16k
 # 8k
-# sox $dirname/$basename.sph -c 1 -e signed-integer build/audio/base/$basename.wav rate -v 8k
+# sox $1 -c 1 -e signed-integer build/audio/base/$basename.wav rate -v 8k
 
 mkdir -p build/diarization/$basename
 
 # make segments from $1.stm
-grep -v "inter_segment_gap" $dirname/$basename.stm | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U S1"}' > build/diarization/$basename/show.seg
+grep -v "inter_segment_gap" $dirname/$basename.stm | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
 
 make SEGMENTS=show.seg build/trans/$basename/wav.scp
 
