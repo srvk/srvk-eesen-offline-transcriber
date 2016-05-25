@@ -197,7 +197,7 @@ build/trans/%/fbank: build/trans/%/spk2utt
 build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	rm -rf build/trans/$*/eesen && mkdir -p build/trans/$*/eesen
 #	(cd build/trans/$*/eesen; for f in $(MODEL_DIR)/*; do ln -s $$f; done)
-	steps/decode_ctc_lat_model.sh --cmd "$$decode_cmd" --nj $(njobs) --beam 17.0 \
+	steps/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --beam 17.0 \
 	--lattice_beam 8.0 --max-active 5000 --skip_scoring true \
 	--acwt $(ACWT) $(GRAPH_DIR) build/trans/$* `dirname $@` $(MODEL_DIR) || exit 1;
 
