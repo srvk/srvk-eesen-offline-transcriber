@@ -27,7 +27,7 @@ sox $1 -c 1 build/audio/base/$basename.wav rate -v 16k
 mkdir -p build/diarization/$basename
 
 # make segments from $1.stm
-grep -v "inter_segment_gap" $dirname/$basename.stm | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
+cat $dirname/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_segment_in_scoring" | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
 
 make SEGMENTS=show.seg build/trans/$basename/wav.scp
 

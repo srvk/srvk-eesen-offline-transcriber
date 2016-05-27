@@ -80,7 +80,7 @@ fi
 if [ $stage -le 2 ]; then
   # filter the stm to look like it came from transcriber
   # filter skipped lines and convert {space apostrophe} to space
-  grep -v "inter_segment_gap" $data/stm | sed -e "s/ '/'/g" > $data/stm.filt
+  cat $data/stm | grep -v "ignore_time_segment_in_scoring" | grep -v "inter_segment_gap"  | sed -e "s/ '/'/g" > $data/stm.filt
   # make an stm file with labels that match transcriber's (use wav.scp first column)
   cat $data/wav.scp | awk '{print $1}' > $data/wav.cut
   cat $data/stm.filt | cut -d ' ' -f 2- > $data/stm.cut

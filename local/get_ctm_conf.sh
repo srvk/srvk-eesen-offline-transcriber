@@ -40,7 +40,7 @@ hubscr=$KALDI_ROOT/tools/sctk/bin/hubscr.pl
 [ ! -f $hubscr ] && echo "Cannot find scoring program at $hubscr" && exit 1;
 hubdir=`dirname $hubscr`
 
-for f in $symtab $dir/lat.1.gz; do
+for f in $symtab $dir/lat.*.gz; do
   [ ! -f $f ] && echo "$0: expecting file $f to exist" && exit 1;
 done
 
@@ -48,6 +48,8 @@ name=`basename $data`; # e.g. HVC000037 - base filename of the input data being 
 
 
 mkdir -p $dir/scoring/log
+
+
 
 # We are not using lattice-align-words, which may result in minor degradation 
 if [ $stage -le 0 ]; then
@@ -78,7 +80,9 @@ fi
 if [ $stage -le 2 ]; then
   # filter the stm to look like it came from transcriber
   # filter skipped lines and convert {space apostrophe} to space
-  grep -v "inter_segment_gap" $data/stm | sed -e "s/ '/'/g" > $data/stm.filt
+  cat $data/stm | grep -v "inter_segment_gap" | grep -v "ignore_time_segment_in_scoring" | \
+      sed -e "s/ '/'/g" > $data/stm.filt
+
   # make an stm file with labels that match transcriber's (use wav.scp first column)
   cat $data/wav.scp | awk '{print $1}' > $data/wav.cut
   cat $data/stm.filt | cut -d ' ' -f 2- > $data/stm.cut
