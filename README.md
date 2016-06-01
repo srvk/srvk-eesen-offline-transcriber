@@ -1,2 +1,2 @@
 # srvk-eesen-offline-transcriber
-Placeholder for srvk/eesen customized version of Tanel Alumae's kaldi-offline-transcriber
+srvk/eesen customized version of Tanel Alumae's [kaldi-offline-transcriber](https://github.com/alumae/kaldi-offline-transcriber)
