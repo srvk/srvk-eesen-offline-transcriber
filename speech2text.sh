@@ -55,28 +55,27 @@ rm $BASEDIR/src-audio/$filename
 echo "Finished transcribing, result is in files $BASEDIR/build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels}"
 
 if [ ! -z $txt ]; then
-  cp $BASEDIR/build/output/${basename%.*}.txt $txt
-  echo $txt
+ cp $BASEDIR/build/output/${basename%.*}.txt $txt
+ echo $txt
 fi
 
-if [ ! -z $trs ]; then                                                                                                                
-  cp $BASEDIR/build/output/${basename%.*}.trs $trs                                                                                    
-fi                                                                                                                                    
-                                                                                                                                      
-if [ ! -z $ctm ]; then                                                                                                                
-  cp $BASEDIR/build/output/${basename%.*}.ctm $ctm                                                                                    
-fi                                                                                                                                    
-                                                                                                                                      
-if [ ! -z $sbv ]; then                                                                                                                
-  cp $BASEDIR/build/output/${basename%.*}.sbv $sbv                                                                                    
-fi    
+if [ ! -z $trs ]; then
+ cp $BASEDIR/build/output/${basename%.*}.trs $trs
+fi
+                                                                   
+if [ ! -z $ctm ]; then
+ cp $BASEDIR/build/output/${basename%.*}.ctm $ctm
+fi
+                                                                   
+if [ ! -z $sbv ]; then
+ cp $BASEDIR/build/output/${basename%.*}.sbv $sbv
+fi  
 
-if [ ! -z $srt ]; then                                                                                                                
-  cp $BASEDIR/build/output/${basename%.*}.srt $srt
-fi    
+if [ ! -z $srt ]; then
+ cp $BASEDIR/build/output/${basename%.*}.srt $srt
+fi
 
-if [ ! -z $labels ]; then                                                                                                                
-  cp $BASEDIR/build/output/${basename%.*}.labels $labels
-fi    
-
+if [ ! -z $labels ]; then
+ cp $BASEDIR/build/output/${basename%.*}.labels $labels
+fi
 
