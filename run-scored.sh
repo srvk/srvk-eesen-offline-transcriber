@@ -18,9 +18,18 @@ dirname=$(dirname "$1")
 extension="${filename##*.}"
 basename="${filename%.*}"
 
+. path.sh
+
 mkdir -p build/audio/base
 
-sox $1 -c 1 build/audio/base/$basename.wav rate -v 16k
+# un-shorten-ify SPH files
+if [ $extension == "sph" ]; then
+    sph2pipe $1 > build/audio/base/$basename.unshorten
+    sox build/audio/base/$basename.unshorten -c 1 build/audio/base/$basename.wav rate -v 16k
+else
+    sox $1 -c 1 build/audio/base/$basename.wav rate -v 16k
+fi
+
 # 8k
 # sox $1 -c 1 -e signed-integer build/audio/base/$basename.wav rate -v 8k
 
