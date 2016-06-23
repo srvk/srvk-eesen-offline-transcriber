@@ -34,7 +34,7 @@ for l in sys.stdin:
         elif 'text' in vars():
             text = text + ' ' + word
         else:
-            text = word
+            if word != '<#s>': text = word
             begin = starttime
 
     elif re.match(";.*") or re.match("#.*"):
@@ -42,3 +42,5 @@ for l in sys.stdin:
 
     else:
         raise Exception("cannot process line: " + l)
+
+printbuf (begin, starttime+duration, text)
