@@ -1,5 +1,8 @@
 # srvk-eesen-offline-transcriber
+
 srvk/eesen customized version of Tanel Alumae's [kaldi-offline-transcriber](https://github.com/alumae/kaldi-offline-transcriber)
+
+This repository can be used to create a Virtual Machine (VM) that contains everything to transcribe (English) audio/ video files and browse the results. You can modify any part of the recognizer (e.g. the language model or acoustic model, or the segmentation strategy) to improve results.
 
 ### Files in this folder
  * `speech2text.sh` - Transcribe audio/video file and produce several output formats at once (plaintext, subtitles, NIST CTM scoring input, Audacity labels)
