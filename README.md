@@ -4,7 +4,7 @@ srvk/eesen customized version of Tanel Alumae's [kaldi-offline-transcriber](http
 
 This repository can be used to create a Virtual Machine (VM) that contains everything to transcribe (English) audio/ video files and browse the results. You can modify any part of the recognizer (e.g. the language model or acoustic model, or the segmentation strategy) to improve results.
 
-To use, clone the repository, change into the repository, and execute `vagrant up`.
+To use, clone the repository, change into the repository, and execute `vagrant up` (assuming that you have installed a suitable [tool](https://vagrantup.com/)).
 
 ### Files in this folder
  * `speech2text.sh` - Transcribe audio/video file and produce several output formats at once (plaintext, subtitles, NIST CTM scoring input, Audacity labels)
