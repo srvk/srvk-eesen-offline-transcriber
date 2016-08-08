@@ -12,9 +12,10 @@ import datetime
 import re
 
 def printbuf (anfang, ende, text, nummer):
-    p=re.compile("\.([0-9][0-9][0-9]).*")
     print nummer
-    print p.sub(',\g<1>', str(datetime.timedelta(seconds=anfang))), "-->", p.sub(',\g<1>', str(datetime.timedelta(seconds=ende)))
+    datetime1 = datetime.datetime.utcfromtimestamp(anfang)
+    datetime2 = datetime.datetime.utcfromtimestamp(ende)
+    print "%s --> %s" % (datetime1.strftime('%H:%M:%S.%f')[:-3], datetime2.strftime('%H:%M:%S.%f')[:-3])
     print text
     print ''
 
@@ -39,12 +40,6 @@ for l in sys.stdin:
         else:
             text = word
             anfang = starttime
-
-        #datetime1 = datetime.datetime.utcfromtimestamp(starttime)
-        #datetime2 = datetime.datetime.utcfromtimestamp(endtime)
-        #print "%s,%s" % (datetime1.strftime('%H:%M:%S.%f'), datetime2.strftime('%H:%M:%S.%f'))
-        #print content
-        #print 
 
     elif re.match(";.*") or re.match("#.*"):
         pass
