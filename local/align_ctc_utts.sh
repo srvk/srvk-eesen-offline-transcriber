@@ -76,7 +76,7 @@ oov_int=`grep $oov_word $langdir/words.txt | awk '{print $2}'`
 
 utils/sym2int.pl --map-oov $oov_int -f 2- $langdir/words.txt $uttdata/text > $dir/text_int 
 
-utils/training_trans_fst.py $dir/text_int | fstcompile | fstarcsort --sort_type=olabel > $dir/G.fst
+local/training_trans_fst.py $dir/text_int | fstcompile | fstarcsort --sort_type=olabel > $dir/G.fst
 
 fsttablecompose ${langdir}/L.fst $dir/G.fst | fstdeterminizestar --use-log=true | \
   fstminimizeencoded | fstarcsort --sort_type=ilabel > $dir/LG.fst || exit 1;
