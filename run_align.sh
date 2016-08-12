@@ -19,7 +19,7 @@ fi
 EESEN_ROOT=~/eesen
 
 # Change these if you're using different models 
-GRAPH_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/data/lang_phn_test
+GRAPH_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/data/lang_phn_test_test_newlm
 MODEL_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/exp/train_phn_l5_c320_v1s
 
 # Generate 'text' format with utterance IDs per line from hypothesis
