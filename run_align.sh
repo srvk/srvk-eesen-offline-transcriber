@@ -7,6 +7,14 @@
 # in an "Eesen Transccriber-centric" way
 # output is found in build/trans/<basename>/align/ali
 
+EESEN_ROOT=~/eesen
+
+# Change these if you're using different models 
+GRAPH_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/data/lang_phn_test_test_newlm
+MODEL_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/exp/train_phn_l5_c320_v1s
+
+. utils/parse_options.sh
+
 if [ $# != 1 ]; then
    echo "Wrong #arguments ($#, expected 1)"
    echo "Usage: run_align.sh <basename>"
@@ -16,11 +24,6 @@ if [ $# != 1 ]; then
    exit 1;
 fi
 
-EESEN_ROOT=~/eesen
-
-# Change these if you're using different models 
-GRAPH_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/data/lang_phn_test_test_newlm
-MODEL_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/exp/train_phn_l5_c320_v1s
 
 # Generate 'text' format with utterance IDs per line from hypothesis
 uttdata=build/trans/$1

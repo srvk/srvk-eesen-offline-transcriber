@@ -281,6 +281,10 @@ build/output/%.srt: build/trans/%/$(FINAL_PASS).ctm
 	mkdir -p `dirname $@`
 	cp $^ $@
 
+build/output/%.ali: build/trans/%/$(FINAL_PASS).txt
+	mkdir -p `dirname $@`
+	./run_align.sh --GRAPH_DIR $(GRAPH_DIR) --MODEL_DIR $(MODEL_DIR) $*
+
 ### Speaker ID stuff
 # i-vectors for each speaker in our audio file
 build/trans/%/ivectors: build/trans/%/mfcc
@@ -318,4 +322,4 @@ build/trans/%/sid-result.txt: build/trans/%/sid-scores.txt
 
 # Also deletes the output files	
 .%.cleanest: .%.clean
-	rm -rf build/output/$*.{trs,txt,ctm,with-compounds.ctm,sbv}
+	rm -rf build/output/$*.{trs,txt,ctm,with-compounds.ctm,sbv,ali,labels}
