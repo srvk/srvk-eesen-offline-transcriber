@@ -28,3 +28,7 @@ cat $uttdata/eesen.hyp | awk '{last=$NF; $NF=""; print last" "$0}' | sed s/\(//g
 
 #                                            <langdir>  <data>     <uttdata>      <mdldir>   <dir>
 local/align_ctc_utts.sh --acoustic_scale 0.8 $GRAPH_DIR $GRAPH_DIR build/trans/$1 $MODEL_DIR $uttdata/align
+
+# Copy results to someplace useful
+cp $uttdata/align/ali build/output/$1.ali
+
