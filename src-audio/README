@@ -1,4 +1,0 @@
-This folder fills up.
-The best way to keep from running out of space is to run speech2text.sh with --clean option
-This is not the default, because people seem to want other artifacts that --clean removes, like
-segmentation, diarization, and the like
