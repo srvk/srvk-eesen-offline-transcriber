@@ -20,22 +20,26 @@ EESEN_ROOT=~/eesen
 GRAPH_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/data/lang_phn_test_test_newlm
 MODEL_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/exp/train_phn_l5_c320_v1s
 
-if [ $# -ne 1 ]; then
-  echo "Usage: align.sh <basename>.{wav,mp3,mp4,sph}"
-  echo " in same folder is test text named <basename>.txt"
-  echo " and STM file named <basename>.stm"
-  echo "./align.sh /vagrant/GaryFlake_2010.wav"
-  echo "output is build/output/<basename>.ali"
-  exit 1;
-fi
-
-filename=$(basename "$1")
-dirname=$(dirname "$1")
-extension="${filename##*.}"
-basename="${filename%.*}"
+# Defaults
+frame_shift=0.03  # 30 ms frames
+lm_weight=0.8     # same as best setting for 30ms eesen tedlium transcriber
 
 . path.sh
 . utils/parse_options.sh
+
+filename=$(basename "$1")
+basename="${filename%.*}"
+dirname=$(dirname "$1")
+extension="${filename##*.}"
+
+if [ $# -ne 1 ]; then
+  echo "Usage: align.sh <basename>.{wav,mp3,mp4,sph}"
+  echo " in same folder is test text named <basename>.txt"
+  echo " and STM file named <basename>.stm (for segments)"
+  echo " ./align.sh /vagrant/GaryFlake_2010.wav"
+  echo " output is build/output/<basename>.ali"
+  exit 1;
+fi
 
 mkdir -p build/audio/base
 
@@ -56,16 +60,17 @@ mkdir -p build/diarization/$basename
 cat $dirname/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_segment_in_scoring" | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
 
 # Generate features
+rm -rf build/trans/$basename/text
 make SEGMENTS=show.seg build/trans/$basename/fbank
 
 # Expect test text in format with utterance IDs per line
 uttdata=build/trans/$basename
 cat $dirname/$basename.txt | awk '{print NR" "$0}' > $uttdata/text
-#cat $uttdata/eesen.hyp | awk '{last=$NF; $NF=""; print last" "$0}' | sed s/\(//g | sed s/\)//g >$uttdata/text
+cp build/diarization/$basename/show.seg $uttdata
 
 #local/align_ctc_multi_utts.sh --acoustic_scale 0.8 $GRAPH_DIR $GRAPH_DIR $uttdata  $MODEL_DIR $uttdata/align
-#                             <langdir>  <data>     <uttdata> <mdldir>   <dir>
-local/align_ctc_multi_utts.sh $GRAPH_DIR $GRAPH_DIR $uttdata  $MODEL_DIR $uttdata/align
+#                                                   <langdir>  <data>     <uttdata> <mdldir>   <dir>
+local/align_ctc_multi_utts.sh --acoustic_scale $lm_weight $GRAPH_DIR $GRAPH_DIR $uttdata  $MODEL_DIR $uttdata/align
 
 # Copy results to someplace useful
 cp $uttdata/align/ali build/output/$basename.ali
