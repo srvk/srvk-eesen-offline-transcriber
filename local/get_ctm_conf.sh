@@ -55,7 +55,7 @@ mkdir -p $dir/scoring/log
 if [ $stage -le 0 ]; then
      $cmd ACWT=$min_acwt:$max_acwt $dir/scoring/log/get_ctm.ACWT.log \
       mkdir -p $dir/score_ACWT/ '&&' \
-      lattice-to-ctm-conf --decode-mbr=true --acoustic-scale=ACWT --ascale-factor=$acwt_factor "ark:gunzip -c $dir/lat.*.gz|" - \| \
+      lattice-to-ctm-conf --frame-shift=0.03 --decode-mbr=true --acoustic-scale=ACWT --ascale-factor=$acwt_factor "ark:gunzip -c $dir/lat.*.gz|" - \| \
       utils/int2sym.pl -f 5 $symtab \
       '>' $dir/score_ACWT/$name.ctm || exit 1;
 fi
