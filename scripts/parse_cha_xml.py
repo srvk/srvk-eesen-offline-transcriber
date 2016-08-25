@@ -2,11 +2,11 @@
 #
 # stripchat.py
 #
-# Print out 'only the words' that are found in a CHAT format file
-# supplied as the only argument
+# Print out 'only the words' that are found in a CHATTER format (xml) file
+# supplied as an argument, or via pipe
 #
 # To toggle whether UNIBET words are printed out, or instead appear as "<oov">
-# set the variable oov.  For formTypes other than UNIBET, add code to the end
+# set the switch --oov.  To instead print their replacements, set the switch --replacment
 #
 # usage ./parse_cha_xml.py P1_6W_SE_C6.xml
 from xml.dom.minidom import parse
@@ -15,7 +15,7 @@ import sys,argparse
 parser=argparse.ArgumentParser(description="""Description""")
 parser.add_argument('--oov', action='store_true', help='print <oov> symbols for nonwords')
 parser.add_argument('--replacement', action='store_true', help='print replacement words')
-parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), help='CHAT format input file',
+parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), help='CHATTER (xml) format input file',
                     default=sys.stdin)
 args=parser.parse_args()
 
