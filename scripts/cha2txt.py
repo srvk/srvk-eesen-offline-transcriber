@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 import sys,subprocess
 
-filename = sys.argv[1].replace(".cha.chatmp","")
+filename = sys.argv[1].replace(".cha","")
 stmfile = open(filename+".stm", 'w')
-filename = filename[filename.rfind("/")+1:]
-
-sys.stdout.write("processing "+filename+"\n")
+recordingname = filename[filename.rfind("/")+1:]
 
 with open(sys.argv[1]) as f:
     lines = f.readlines()
@@ -27,18 +25,7 @@ for line in lines:
         timecode2 = timecode.replace("","")
         time1 = timecode2.split("_")[0]
         time2 = timecode2.split("_")[1]
-        stmfile.write( filename+" "+speaker+" "+filename+"_"+speaker+" "+\
+        stmfile.write( recordingname+" "+speaker+" "+recordingname+"_"+speaker+" "+\
                            "{0:.3f}".format(float(time1)/1000)+" "+"{0:.3f}".format(float(time2)/1000))
-        # call subprocess shell script to sanitize CHA strings
-        tmpfile = open("/tmp/chatmp.txt", 'w')
-        for i in range(1,len(splits)-1):
-            tmpfile.write(" "+splits[i])
-        tmpfile.write("\n")
-        tmpfile.close()
-        result = subprocess.check_output(["local/stripcha.sh", "/tmp/chatmp.txt"]);
-        if result == " \n" or result == "":
-            stmfile.write(" (%HESITATION)\n");
-        else:
-            stmfile.write(result);
-
+        stmfile.write("\n")
 stmfile.close()
