@@ -31,7 +31,9 @@ if [ $extension == "sph" ]; then
     sph2pipe $1 > build/audio/base/$basename.unshorten
     sox build/audio/base/$basename.unshorten -c 1 build/audio/base/$basename.wav rate -v 16k
 else
-    sox $1 -c 1 build/audio/base/$basename.wav rate -v 16k
+    mkdir -p src-audio
+    cp $1 src-audio
+    make build/audio/base/$basename.wav
 fi
 
 mkdir -p build/diarization/$basename
@@ -41,12 +43,10 @@ mkdir -p build/trans/$basename
 
 if [ -f $dirname/$basename.cha ]; then
   echo "CHA file found: " $dirname/$basename.cha
-  # CHA format
-  perl -0777 -pe 's/\n\t/ /igs' $dirname/$basename.cha > build/trans/$basename/$basename.chatmp
-  # creates $basename.STM
-  python scripts/cha2txt.py build/trans/$basename/$basename.chatmp
-  mv build/trans/$basename/$basename.chatmp.stm build/trans/$basename/$basename.stm
-  rm build/trans/$basename/$basename.chatmp
+  # creates $basename.stm
+  local/cha2stm.sh $dirname/$basename.cha
+
+
 elif [ -f $dirname/$basename.stm ]; then
   # STM format
   echo "STM file found: " $dirname/$basename.stm
