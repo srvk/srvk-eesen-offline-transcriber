@@ -63,7 +63,7 @@ done
 
 ## Set up the features
 echo "$0: feature: norm_vars(${norm_vars}) add_deltas(${add_deltas}) splice_feats(${splice_feats}) subsample_feats(${subsample_feats})"
-#feats="ark,s,cs:apply-cmvn --norm-vars=$norm_vars --utt2spk=ark:$data/utt2spk scp:$data/cmvn.scp scp:$uttdata/feats.scp ark:- |"
+
 feats="ark,s,cs:apply-cmvn --norm-vars=$norm_vars --utt2spk=ark:$uttdata/utt2spk scp:$uttdata/cmvn.scp scp:$uttdata/feats.scp ark:- |"
 $add_deltas && feats="$feats add-deltas ark:- ark:- |"
 $splice_feats && feats="$feats splice-feats --left-context=1 --right-context=1 ark:- ark:- |"
@@ -76,19 +76,39 @@ oov_int=`grep $oov_word $langdir/words.txt | awk '{print $2}'`
 
 utils/sym2int.pl --map-oov $oov_int -f 2- $langdir/words.txt $uttdata/text > $dir/text_int 
 
-local/training_trans_fst.py $dir/text_int | fstcompile | fstarcsort --sort_type=olabel > $dir/G.fst
+touch $dir/ali
+cp $uttdata/feats.scp $dir
 
-fsttablecompose ${langdir}/L.fst $dir/G.fst | fstdeterminizestar --use-log=true | \
-  fstminimizeencoded | fstarcsort --sort_type=ilabel > $dir/LG.fst || exit 1;
+# read one line (utterance) at a time from $dir/text_int
+# utt happens to be the line number
+while read utt; do
 
-fsttablecompose ${langdir}/T.fst $dir/LG.fst > $dir/TLG.fst || exit 1;
+    # create file with one utterance
+    echo $utt > $dir/text_int_utt
+
+    # get the feats for this one utterance, overwrite feats.scp
+    line=`awk '{print $1}' $dir/text_int_utt`
+    awk -v n=$line 'NR == n' $dir/feats.scp > $uttdata/feats.scp
+
+    local/training_trans_fst.py $dir/text_int_utt | fstcompile | fstarcsort --sort_type=olabel > $dir/G.fst
+
+    fsttablecompose ${langdir}/L.fst $dir/G.fst | fstdeterminizestar --use-log=true | \
+	fstminimizeencoded | fstarcsort --sort_type=ilabel > $dir/LG.fst || exit 1;
+
+    fsttablecompose ${langdir}/T.fst $dir/LG.fst > $dir/TLG.fst || exit 1;
+
+    # now for some real fun. 'decoding' below takes features as input, and operates over all
+    # of them - all the utterances in the feats.scp files. But we only want one at a time, so
+    
 
 ## Generate alignments
-net-output-extract --class-frame-counts=$mdldir/label.counts --apply-log=true $mdldir/final.nnet "$feats" ark:- | \
-  latgen-faster  --max-active=$max_active --max-mem=$max_mem --beam=$beam --lattice-beam=$lattice_beam \
-  --acoustic-scale=$acoustic_scale --word-symbol-table=$langdir/words.txt --allow-partial=true $dir/TLG.fst ark:- ark:- | \
-  lattice-1best --acoustic-scale=$acoustic_scale --ascale-factor=1 ark:- ark:- | \
-  nbest-to-ctm ark:- - | \
-  utils/int2sym.pl -f 5 $langdir/words.txt > $dir/ali
+    net-output-extract --class-frame-counts=$mdldir/label.counts --apply-log=true $mdldir/final.nnet "$feats" ark:- | \
+	latgen-faster  --max-active=$max_active --max-mem=$max_mem --beam=$beam --lattice-beam=$lattice_beam \
+	--acoustic-scale=$acoustic_scale --word-symbol-table=$langdir/words.txt --allow-partial=true $dir/TLG.fst ark:- ark:- | \
+	lattice-1best --acoustic-scale=$acoustic_scale --ascale-factor=1 ark:- ark:- | \
+	nbest-to-ctm ark:- - | \
+	utils/int2sym.pl -f 5 $langdir/words.txt >> $dir/ali
+
+done < $dir/text_int
 
 exit 0;
