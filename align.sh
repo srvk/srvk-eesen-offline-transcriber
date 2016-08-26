@@ -8,11 +8,11 @@
 
 # Required inputs:
 #
-# * a 'hypothesis' text file for which to compute alignments
-#
-# * an STM file with utterances, timings - 'perfect' transcription
-#
-# * an audio file
+# * a 'hypothesis' text file for which to compute alignments, extension .txt
+#   one utterance per line. If no hypothesis text is found, text
+#   is obtained from the STM file below
+# * an STM file with utterance/segment timings - 'perfect' transcription
+# * an audio file, extension can vary (.mp3, .wav, .mp4 etc)
 
 EESEN_ROOT=~/eesen
 
@@ -44,20 +44,27 @@ fi
 mkdir -p build/audio/base
 
 # un-shorten-ify SPH files
-if [ $extension == "sph" ]; then
-    sph2pipe $1 > build/audio/base/$basename.unshorten
-    sox build/audio/base/$basename.unshorten -c 1 build/audio/base/$basename.wav rate -v 16k
-else
-    sox $1 -c 1 build/audio/base/$basename.wav rate -v 16k
-fi
+#if [ $extension == "sph" ]; then
+#    sph2pipe $1 > build/audio/base/$basename.unshorten
+#    sox build/audio/base/$basename.unshorten -c 1 build/audio/base/$basename.wav rate -v 16k
+#fi
+
+mkdir -p src-audio
+cp $1 src-audio
+make build/audio/base/$basename.wav
 
 # 8k
 # sox $1 -c 1 -e signed-integer build/audio/base/$basename.wav rate -v 8k
 
 mkdir -p build/diarization/$basename
+# make STM from cha
+if [ -f $dirname/$basename.cha -a ! -f $dirname/$basename.stm ]; then
+  local/cha2stm.sh $dirname/$basename.cha > $dirname/$basename.stm
+fi
 
 # make segments from $1.stm
 cat $dirname/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_segment_in_scoring" | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
+
 
 # Generate features
 rm -rf build/trans/$basename/text
@@ -65,7 +72,15 @@ make SEGMENTS=show.seg build/trans/$basename/fbank
 
 # Expect test text in format with utterance IDs per line
 uttdata=build/trans/$basename
-cat $dirname/$basename.txt | awk '{print NR" "$0}' > $uttdata/text
+if [ -f $dirname/$basename.txt ];
+  then
+    echo "Aligning text found at $dirname/$basename.txt"
+    cat $dirname/$basename.txt | awk '{print NR" "$0}' > $uttdata/text
+  else
+    echo "Aligning text found in $dirname/$basename.stm"
+    cat $dirname/$basename.stm | awk '{$1="";$2="";$3="";$4="";$5=""; $6=""; print NR$0}' \
+	| sed 's/     //' > $uttdata/text
+fi
 cp build/diarization/$basename/show.seg $uttdata
 
 #local/align_ctc_multi_utts.sh --acoustic_scale 0.8 $GRAPH_DIR $GRAPH_DIR $uttdata  $MODEL_DIR $uttdata/align
