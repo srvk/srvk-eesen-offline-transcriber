@@ -5,12 +5,15 @@
 # Print out 'only the words' that are found in a CHATTER format xml (http://talkbank.org/software/chatter.html)
 # supplied as an argument, or via a pipe
 #
-# To toggle whether UNIBET words are printed out, or instead appear as "<oov>"
+# To toggle whether UNIBET words are printed out, or instead appear as "<unk>"
 # set the switch --oov.  To instead print their replacements, set the switch --replacment
 #
 # usage ./parse_cha_xml.py P1_6W_SE_C6.xml
 from xml.dom.minidom import parse
 import sys,argparse
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 parser=argparse.ArgumentParser(description="""Description""")
 parser.add_argument('--oov', action='store_true', help='print <oov> symbols for nonwords')
@@ -44,9 +47,9 @@ for utt in utts:
                 if key == "end":
                     end = word.attributes[key].nodeValue
                     if stm:
-                        print spk_reco_clause+start+end+utterance
+                        print spk_reco_clause+start+" "+end+utterance.lower()
                     else: 
-                        print utterance
+                        print utterance.lower()
                     utterance = ""
         # tb:wordType ("<w>" tag)
         if word.nodeType == word.ELEMENT_NODE and word.tagName == 'w':
@@ -67,7 +70,7 @@ for utt in utts:
                                 utterance += wordlet.nodeValue.encode('utf8')
                     else:
                         # print oov (or unibet encoded word)
-                        if oov: utterance += " " + "<oov>"
+                        if oov: utterance += " " + "<unk>"
                         else:
                             for key in group.attributes.keys():
                                 if key == "type" and group.attributes[key].nodeValue == "fragment":
