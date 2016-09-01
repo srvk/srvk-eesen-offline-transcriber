@@ -22,8 +22,12 @@ parser.add_argument('--stm', action='store_true', help='produce STM format')
 parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), help='CHATTER (xml) format input file',
                     default=sys.stdin)
 args=parser.parse_args()
+
 infile = args.infile.name
-dom = parse(infile)
+if infile == '<stdin>':
+    dom = parse(sys.stdin)
+else:
+    dom = parse(infile)
 utts = dom.getElementsByTagName('u') # utterances
 oov = args.oov
 stm = args.stm
