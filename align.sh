@@ -59,7 +59,7 @@ make build/audio/base/$basename.wav
 mkdir -p build/diarization/$basename
 # make STM from cha
 if [ -f $dirname/$basename.cha -a ! -f $dirname/$basename.stm ]; then
-  local/cha2stm.sh $dirname/$basename.cha > $dirname/$basename.stm
+  local/cha2stm.sh $dirname/$basename.cha | sed 's/xxx/\<unk\>/g' > $dirname/$basename.stm
 fi
 
 # make segments from $1.stm
@@ -67,7 +67,7 @@ cat $dirname/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_
 
 
 # Generate features
-rm -rf build/trans/$basename/text
+rm -rf build/trans/$basename
 make SEGMENTS=show.seg build/trans/$basename/fbank
 
 # Expect test text in format with utterance IDs per line
@@ -78,8 +78,8 @@ if [ -f $dirname/$basename.txt ];
     cat $dirname/$basename.txt | awk '{print NR" "$0}' > $uttdata/text
   else
     echo "Aligning text found in $dirname/$basename.stm"
-    cat $dirname/$basename.stm | awk '{$1="";$2="";$3="";$4="";$5=""; $6=""; print NR$0}' \
-	| sed 's/     //' > $uttdata/text
+    cat $dirname/$basename.stm | awk '{$1="";$2="";$3="";$4="";$5=""; print NR$0}' \
+	| sed 's/    //' > $uttdata/text
 fi
 cp build/diarization/$basename/show.seg $uttdata
 
