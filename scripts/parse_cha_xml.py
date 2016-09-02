@@ -85,6 +85,16 @@ for utt in utts:
                                             if subword.nodeType == subword.ELEMENT_NODE and subword.tagName == 'replacement':
                                                 for replacement in subword.childNodes:
                                                     if replacement.nodeType == replacement.ELEMENT_NODE and replacement.tagName == 'w':
-                                                        utterance += " " + replacement.firstChild.nodeValue
+                                                        #utterance += " " + replacement.firstChild.nodeValue
+                                                        for wordlet in replacement.childNodes:
+                                                            if wordlet.nodeType == wordlet.TEXT_NODE:
+                                                                utterance += " "
+                                                                utterance += wordlet.nodeValue.encode('utf8')
+
                                     else:
-                                        utterance += " " + group.firstChild.nodeValue
+                                        # utterance += " " + group.firstChild.nodeValue
+                                        for wordlet in group.childNodes:
+                                            if wordlet.nodeType == wordlet.TEXT_NODE:
+                                                utterance += " "
+                                                utterance += wordlet.nodeValue.encode('utf8')
+
