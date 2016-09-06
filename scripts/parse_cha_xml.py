@@ -52,15 +52,15 @@ def addWord( node ):
 
 
 def addReplacement ( group ):
-    if replace:
-        for subword in group.childNodes:
-            if subword.nodeType == subword.ELEMENT_NODE and subword.tagName == 'replacement':
-                for replacement in subword.childNodes:
-                    if replacement.nodeType == replacement.ELEMENT_NODE and replacement.tagName == 'w':
-                        addWord( replacement )
-                    else:
-                        addWord( group )
-
+    added = False
+    for subword in group.childNodes:
+        if subword.nodeType == subword.ELEMENT_NODE and subword.tagName == 'replacement':
+            for replacement in subword.childNodes:
+                if replacement.nodeType == replacement.ELEMENT_NODE and replacement.tagName == 'w':
+                    addWord( replacement )
+                    added = True
+    # didn't find a <replacement> - just output the word
+    if not added: addWord( group )
 
 def addUnibetOrReplacement( node ):
     global utterance
@@ -102,7 +102,13 @@ for utt in utts:
         # tb:wordType ("<w>" tag)
         if word.nodeType == word.ELEMENT_NODE and word.tagName == 'w':
             if len(word.attributes.keys())==0:
-                addWord( word )
+                if word.childNodes.length == 1:
+                    addWord( word )
+                else:
+                    if replace:
+                        addReplacement( word )
+                    else:
+                        addWord( word )
             else:
                 addUnibetOrReplacement( word )
         # tb:groupType ("<g>" tag):
@@ -117,12 +123,6 @@ for utt in utts:
                                 addReplacement( group )
                             else:
                                 addWord( group )
-                            
-                        #    addUnibetOrReplacement( group )
-                        # Word has no attributes, can only utterance += " " + the word
-                        #print "WORD: ",; print group
-                        #print "CHILDS: ",; print group.childNodes
-                        #                        addWord( group )
                     else:
                         # print oov (or unibet encoded word)
                         if oov:
