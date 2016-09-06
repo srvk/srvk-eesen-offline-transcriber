@@ -31,8 +31,52 @@ else:
 utts = dom.getElementsByTagName('u') # utterances
 oov = args.oov
 stm = args.stm
-replacement = args.replacement
+replace = args.replacement
 recording = infile[infile.rfind("/")+1:]
+#utterance = ""
+
+# add the word found inside node passed in as argument
+def addWord( node ):
+    global utterance
+    for wordlet in node.childNodes:
+        if wordlet.nodeType == wordlet.TEXT_NODE:
+            unibet = False
+            s = wordlet.nodeValue
+            try: s.decode('ascii')
+            except UnicodeDecodeError: unibet = True
+            utterance += " "
+            if oov and unibet:
+                utterance += "<unk>"
+            else:
+                utterance += wordlet.nodeValue.encode('utf8')
+
+
+def addReplacement ( group ):
+    if replace:
+        for subword in group.childNodes:
+            if subword.nodeType == subword.ELEMENT_NODE and subword.tagName == 'replacement':
+                for replacement in subword.childNodes:
+                    if replacement.nodeType == replacement.ELEMENT_NODE and replacement.tagName == 'w':
+                        addWord( replacement )
+                    else:
+                        addWord( group )
+
+
+def addUnibetOrReplacement( node ):
+    global utterance
+    for key in node.attributes.keys():
+        if key == "untranscribed":
+            if oov:
+                utterance += " " + "<unk>"
+            else:
+                addWord( node )
+        if key == "type" and (node.attributes[key].nodeValue == "fragment"):
+            utterance += " " + node.firstChild.nodeValue
+        if key == "formType" and node.attributes[key].nodeValue == "UNIBET":
+            if replace:
+                addReplacement( node )
+            else:
+                addWord( node )
 
 for utt in utts:
     utterance = ""
@@ -40,7 +84,7 @@ for utt in utts:
     for key in utt.attributes.keys():
         if key == "who":
             speaker=utt.attributes[key].nodeValue
-            spk_reco_clause = recording+" "+speaker+" "+recording+"_"+speaker+" "
+            spk_reco_clause = recording+" "+speaker+" "+recording+"_"+speaker+" <parse_cha_xml> "
 
     for word in utt.childNodes:
         # time code
@@ -57,44 +101,31 @@ for utt in utts:
                     utterance = ""
         # tb:wordType ("<w>" tag)
         if word.nodeType == word.ELEMENT_NODE and word.tagName == 'w':
-            for wordlet in word.childNodes:
-                if wordlet.nodeType == wordlet.TEXT_NODE:
-                    utterance += " "
-                    utterance += wordlet.nodeValue.encode('utf8')
-
+            if len(word.attributes.keys())==0:
+                addWord( word )
+            else:
+                addUnibetOrReplacement( word )
         # tb:groupType ("<g>" tag):
         if word.nodeType == word.ELEMENT_NODE and word.tagName == 'g':
             for group in word.childNodes:
                 if group.nodeType == group.ELEMENT_NODE and group.tagName == 'w':
                     if len(group.attributes.keys())==0:
+                        if group.childNodes.length == 1:
+                            addWord( group )
+                        else:
+                            if replace:
+                                addReplacement( group )
+                            else:
+                                addWord( group )
+                            
+                        #    addUnibetOrReplacement( group )
                         # Word has no attributes, can only utterance += " " + the word
-                        for wordlet in group.childNodes:
-                            if wordlet.nodeType == wordlet.TEXT_NODE:
-                                utterance += " "
-                                utterance += wordlet.nodeValue.encode('utf8')
+                        #print "WORD: ",; print group
+                        #print "CHILDS: ",; print group.childNodes
+                        #                        addWord( group )
                     else:
                         # print oov (or unibet encoded word)
-                        if oov: utterance += " " + "<unk>"
+                        if oov:
+                            utterance += " " + "<unk>"
                         else:
-                            for key in group.attributes.keys():
-                                if key == "type" and group.attributes[key].nodeValue == "fragment":
-                                    utterance += " " + group.firstChild.nodeValue
-                                if key == "formType" and group.attributes[key].nodeValue == "UNIBET":
-                                    if replacement:
-                                        for subword in group.childNodes:
-                                            if subword.nodeType == subword.ELEMENT_NODE and subword.tagName == 'replacement':
-                                                for replacement in subword.childNodes:
-                                                    if replacement.nodeType == replacement.ELEMENT_NODE and replacement.tagName == 'w':
-                                                        #utterance += " " + replacement.firstChild.nodeValue
-                                                        for wordlet in replacement.childNodes:
-                                                            if wordlet.nodeType == wordlet.TEXT_NODE:
-                                                                utterance += " "
-                                                                utterance += wordlet.nodeValue.encode('utf8')
-
-                                    else:
-                                        # utterance += " " + group.firstChild.nodeValue
-                                        for wordlet in group.childNodes:
-                                            if wordlet.nodeType == wordlet.TEXT_NODE:
-                                                utterance += " "
-                                                utterance += wordlet.nodeValue.encode('utf8')
-
+                            addUnibetOrReplacement( group )
