@@ -78,8 +78,8 @@ if [ -f $dirname/$basename.txt ];
     cat $dirname/$basename.txt | awk '{print NR" "$0}' > $uttdata/text
   else
     echo "Aligning text found in $dirname/$basename.stm"
-    cat $dirname/$basename.stm | awk '{$1="";$2="";$3="";$4="";$5=""; print NR$0}' \
-	| sed 's/    //' > $uttdata/text
+    cat $dirname/$basename.stm | awk '{$1="";$2="";$3="";$4="";$5="";$6=""; print NR$0}' \
+	| sed 's/ \+/ /' > $uttdata/text
 fi
 cp build/diarization/$basename/show.seg $uttdata
 
