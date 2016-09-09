@@ -41,7 +41,7 @@ if [ $# -ne 1 ]; then
   exit 1;
 fi
 
-mkdir -p build/audio/base
+mkdir -p build/audio/base build/output
 
 # un-shorten-ify SPH files
 #if [ $extension == "sph" ]; then
