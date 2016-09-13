@@ -112,6 +112,8 @@ while read utt; do
 	nbest-to-ctm --frame-shift=$frame_shift ark:- - | \
 	utils/int2sym.pl -f 5 $langdir/words.txt > $dir/utt_ali
 
+    cp $dir/utt_ali $dir/utt_ali_$start_time
+
     # fix up start times for this utterance
     awk -v st=$start_time '{OFMT = "%.2f"; print $1,$2,($3*100+st)/100,$4,$5}' $dir/utt_ali >>$dir/ali
 

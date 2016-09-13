@@ -80,11 +80,12 @@ def addUnibetOrReplacement( node ):
 
 for utt in utts:
     utterance = ""
+    start = 0
     # speaker
     for key in utt.attributes.keys():
         if key == "who":
             speaker=utt.attributes[key].nodeValue
-            spk_reco_clause = recording+" "+speaker+" "+recording+"_"+speaker+" <parse_cha_xml> "
+            spk_reco_clause = recording+" "+speaker+" "+recording+"_"+speaker
 
     for word in utt.childNodes:
         # time code
@@ -95,7 +96,7 @@ for utt in utts:
                 if key == "end":
                     end = word.attributes[key].nodeValue
                     if stm:
-                        print spk_reco_clause+start+" "+end+utterance.lower()
+                        print spk_reco_clause+" "+start+" "+end+" <parse_cha_xml>"+utterance.lower()
                     else: 
                         print utterance.lower()
                     utterance = ""
