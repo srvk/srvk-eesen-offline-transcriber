@@ -4,7 +4,7 @@
 #
 # Merge the alignments back into XML format suitable for CHATTER to turn into CHA format
 #
-# usage example ./merge_align_cha.py myfile.xml
+# usage example ./merge_align_cha.py myfile.xml myfile.ali
 
 from xml.dom.minidom import parse
 import sys,argparse
@@ -28,6 +28,7 @@ stopped = False
 
 alignline = alignfile.readline()
 aligntime = alignline.split()[0]
+
 timecode = aligntime[aligntime.rfind("---")+3:]
 
 def getTimecode( line ):
@@ -37,23 +38,29 @@ def getTimecode( line ):
 def doWord( thisUtt, word ):
     global stopped
     global timecode
+    global alignline
     if (not stopped):
         # insert word timing into DOM (xml)
         mediatag = dom.createElement("internal-media")
-        time1 = timecode.split("-")[0]
-        time2 = timecode.split("-")[1]
+        time1 = format(float(alignline.split()[2]), '.3f')
+        time2 = format(float(alignline.split()[3]) + float(time1), '.3f')
+
         mediatag.setAttribute("start", time1)
         mediatag.setAttribute("end", time2)
         mediatag.setAttribute("unit", "s")
 
-        thisUtt.insertBefore(mediatag, word.nextSibling)
+        # some alignments have zero length (sorry)
+        # CHATTER doesn't like this. Rather than fudge numbers, just
+        # leave out this word alignment - cleanest option
+        if (time1 != time2):
+            thisUtt.insertBefore(mediatag, word.nextSibling)
 
-        line = alignfile.readline()
+        alignline = alignfile.readline()
         # handle end of file
-        if (line == ""):
-            stopped = False
+        if (alignline == ""):
+            stopped = True
             return
-        newTimecode = getTimecode(line)
+        newTimecode = getTimecode(alignline)
         if (newTimecode != timecode):
             timecode = newTimecode
             stopped = True
