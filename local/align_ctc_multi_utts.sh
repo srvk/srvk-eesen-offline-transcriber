@@ -77,7 +77,7 @@ oov_int=`grep $oov_word $langdir/words.txt | awk '{print $2}'`
 
 utils/sym2int.pl --map-oov $oov_int -f 2- $langdir/words.txt $uttdata/text > $dir/text_int 
 
-rm $dir/ali
+rm -f $dir/ali
 touch $dir/ali
 cp $uttdata/feats.scp $dir
 
