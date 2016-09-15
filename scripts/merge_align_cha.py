@@ -24,7 +24,8 @@ utts = dom.getElementsByTagName('u') # utterance tags "<u>"
 
 alignfile = open(args.alignfile.name, 'r')
 
-stopped = False
+noMoreUtteranceAlignments = False
+doneWithDocument = False
 
 alignline = alignfile.readline()
 aligntime = alignline.split()[0]
@@ -36,10 +37,11 @@ def getTimecode( line ):
     return time[time.rfind("---")+3:]
 
 def doWord( thisUtt, word ):
-    global stopped
+    global noMoreUtteranceAlignments
+    global doneWithDocument
     global timecode
     global alignline
-    if (not stopped):
+    if (not noMoreUtteranceAlignments and not doneWithDocument):
         # insert word timing into DOM (xml)
         mediatag = dom.createElement("internal-media")
         time1 = format(float(alignline.split()[2]), '.3f')
@@ -58,21 +60,22 @@ def doWord( thisUtt, word ):
         alignline = alignfile.readline()
         # handle end of file
         if (alignline == ""):
-            stopped = True
+            noMoreUtteranceAlignments = True
+            doneWithDocument = True
             return
         newTimecode = getTimecode(alignline)
         if (newTimecode != timecode):
             timecode = newTimecode
-            stopped = True
+            noMoreUtteranceAlignments = True
         else:
-            stopped = False
+            noMoreUtteranceAlignments = False
 
 # Read one line at a time from alignfile
 # For each unique timestamp, add XML 'bullet' tags for corresponding <u>tterance / <w>ord pair
 
 for utt in utts:
     if (utt.nodeType == utt.ELEMENT_NODE and utt.tagName == "u"):
-        stopped = False
+        noMoreUtteranceAlignments = False
 
         # speaker
         for key in utt.attributes.keys():
