@@ -3,35 +3,21 @@
 # Copyright 2016  er1k
 # Apache 2.0
 
-# Prepare data for, and run align_ctc_utts.sh script that generates word-level alignments
-# in an "Eesen Transccriber-centric" way
-# output is found in build/trans/<basename>/align/ali
+# Given audio and CHA transcript, generate a new CHA transcript
+# with word-level timings, using Eesen decoder & models
+# Calls:
+#   scripts/parse_cha_xml.py
+#   scripts/merge_align_cha.py
 
-EESEN_ROOT=~/eesen
+filename=$(basename "$1")
+basename="${filename%.*}"
+dirname=$(dirname "$1")
+extension="${filename##*.}"
 
-# Change these if you're using different models 
-GRAPH_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/data/lang_phn_test_test_newlm
-MODEL_DIR=$EESEN_ROOT/asr_egs/tedlium/v2-30ms/exp/train_phn_l5_c320_v1s
+./align.sh $1
+python scripts/merge_align_cha.py $dirname/$basename.xml build/output/$basename.ali >build/trans/$basename/$basename.xml
 
-. utils/parse_options.sh
+# convert back to CHA format
 
-if [ $# != 1 ]; then
-   echo "Wrong #arguments ($#, expected 1)"
-   echo "Usage: run_align.sh <basename>"
-   echo "       where <basename> is the base name of a file processed by eesen-offline-transcriber"
-   echo " e.g.: ./run_align.sh test2"
-   echo "output will be in build/trans/<basename>/align/ali"
-   exit 1;
-fi
-
-
-# Generate 'text' format with utterance IDs per line from hypothesis
-uttdata=build/trans/$1
-cat $uttdata/eesen.hyp | awk '{last=$NF; $NF=""; print last" "$0}' | sed s/\(//g | sed s/\)//g >$uttdata/text
-
-#                                            <langdir>  <data>     <uttdata>      <mdldir>   <dir>
-local/align_ctc_utts.sh --acoustic_scale 0.8 $GRAPH_DIR $GRAPH_DIR build/trans/$1 $MODEL_DIR $uttdata/align
-
-# Copy results to someplace useful
-cp $uttdata/align/ali build/output/$1.ali
+ ~/bin/lib/zulu8.17.0.3-jdk8.0.102-linux_x64/bin/java -cp lib/chatter.jar org.talkbank.chatter.App -inputFormat xml -outputFormat cha -output build/output/$basename.cha build/trans/$basename/$basename.xml
 
