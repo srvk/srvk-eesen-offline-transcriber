@@ -42,9 +42,9 @@ fi
 if [ -f $dirname/$basename.cha ]; then
   #
   # First convert CHA to CHATTER xml
-  ~/bin/lib/zulu8.17.0.3-jdk8.0.102-linux_x64/bin/java -cp lib/chatter.jar org.talkbank.chatter.App -inputFormat cha -outputFormat xml -output $dirname/$basename.xml $dirname/$basename.cha
+  ~/bin/lib/zulu8.17.0.3-jdk8.0.102-linux_x64/bin/java -cp ~/bin/lib/chatter.jar org.talkbank.chatter.App -inputFormat cha -outputFormat xml -output $dirname/$basename.xml $dirname/$basename.cha
 
   # Convert CHATTER xml to STM
   #python scripts/parse_cha_xml.py $dirname/$basename.xml --stm --replacement
-  python scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
+  python ~/tools/srvk-eesen-offline-transcriber/scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
 fi
