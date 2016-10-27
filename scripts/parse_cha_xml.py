@@ -10,7 +10,7 @@
 #
 # usage ./parse_cha_xml.py P1_6W_SE_C6.xml
 from xml.dom.minidom import parse
-import sys,argparse
+import sys,argparse,os
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -32,7 +32,10 @@ utts = dom.getElementsByTagName('u') # utterances
 oov = args.oov
 stm = args.stm
 replace = args.replacement
-recording = infile[infile.rfind("/")+1:]
+#recording = infile[infile.rfind("/")+1:]
+# get only base name (chop off .xml extension)
+recording = os.path.splitext(os.path.basename(infile))[0]
+
 #utterance = ""
 
 # add the word found inside node passed in as argument
@@ -96,9 +99,13 @@ for utt in utts:
                 if key == "end":
                     end = word.attributes[key].nodeValue
                     if stm:
-                        print spk_reco_clause+" "+start+" "+end+" <parse_cha_xml>"+utterance.lower()
+                        # Don't output if start == end; confuses downstream systems
+                        if start != end:
+                            print spk_reco_clause+" "+start+" "+end+" <parse_cha_xml>"+utterance.lower()
+                        sys.stdout.flush()
                     else: 
                         print utterance.lower()
+                        sys.stdout.flush()
                     utterance = ""
         # tb:wordType ("<w>" tag)
         if word.nodeType == word.ELEMENT_NODE and word.tagName == 'w':
