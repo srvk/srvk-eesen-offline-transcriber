@@ -11,7 +11,7 @@ cmd=run.pl
 num_threads=1
 
 max_active=7000    # max-active
-beam=15.0          # beam used
+beam=23.0          # beam used
 lattice_beam=8.0
 max_mem=50000000   # approx. limit to memory consumption during minimization in bytes
 
