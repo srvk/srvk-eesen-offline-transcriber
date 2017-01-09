@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # mkpages.sh - script to create web pages from a folder (beneath the /vagrant/www directory)
 #              containing videos named "public" with subfolders "video" and subtitles "sub"
