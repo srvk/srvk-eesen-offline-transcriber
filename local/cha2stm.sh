@@ -29,7 +29,8 @@ fi
 
 # now get java 8
 if [ -d zulu8.17.0.3-jdk8.0.102-linux_x64 ]; then
-  echo "Not installing Java 8 since it is already there." 1>&2
+  :
+  #echo "Not installing Java 8 since it is already there." 1>&2
 else
   echo "Downloading and installing Java 8" 1>&2
   wget http://cdn.azul.com/zulu/bin/zulu8.17.0.3-jdk8.0.102-linux_x64.tar.gz 1>&2 || exit 1
@@ -42,9 +43,9 @@ fi
 if [ -f $dirname/$basename.cha ]; then
   #
   # First convert CHA to CHATTER xml
-  ~/bin/lib/zulu8.17.0.3-jdk8.0.102-linux_x64/bin/java -cp lib/chatter.jar org.talkbank.chatter.App -inputFormat cha -outputFormat xml -output $dirname/$basename.xml $dirname/$basename.cha
+  ~/bin/lib/zulu8.17.0.3-jdk8.0.102-linux_x64/bin/java -cp ~/bin/lib/chatter.jar org.talkbank.chatter.App -inputFormat cha -outputFormat xml -output $dirname/$basename.xml $dirname/$basename.cha
 
   # Convert CHATTER xml to STM
   #python scripts/parse_cha_xml.py $dirname/$basename.xml --stm --replacement
-  python scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
+  python ~/tools/srvk-eesen-offline-transcriber/scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
 fi

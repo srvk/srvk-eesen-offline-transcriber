@@ -14,6 +14,7 @@
 # * an STM file with utterance/segment timings - 'perfect' transcription
 # * an audio file, extension can vary (.mp3, .wav, .mp4 etc)
 
+BASEDIR=$(dirname $0)
 EESEN_ROOT=~/eesen
 
 # Change these if you're using different models 
@@ -25,7 +26,7 @@ frame_shift=0.03  # 30 ms frames
 lm_weight=0.8     # same as best setting for 30ms eesen tedlium transcriber
 
 . path.sh
-. utils/parse_options.sh
+. $BASEDIR/utils/parse_options.sh
 
 filename=$(basename "$1")
 basename="${filename%.*}"
@@ -41,7 +42,7 @@ if [ $# -ne 1 ]; then
   exit 1;
 fi
 
-mkdir -p build/audio/base build/output
+mkdir -p $BASEDIR/build/audio/base build/output
 
 # un-shorten-ify SPH files
 #if [ $extension == "sph" ]; then
@@ -49,14 +50,14 @@ mkdir -p build/audio/base build/output
 #    sox build/audio/base/$basename.unshorten -c 1 build/audio/base/$basename.wav rate -v 16k
 #fi
 
-mkdir -p src-audio
-cp $1 src-audio
-make build/audio/base/$basename.wav
+mkdir -p $BASEDIR/src-audio
+cp $1 $BASEDIR/src-audio
+make $BASEDIR/build/audio/base/$basename.wav
 
 # 8k
 # sox $1 -c 1 -e signed-integer build/audio/base/$basename.wav rate -v 8k
 
-mkdir -p build/diarization/$basename
+mkdir -p $BASEDIR/build/diarization/$basename
 # make STM from cha
 if [ -f $dirname/$basename.cha -a ! -f $dirname/$basename.stm ]; then
   local/cha2stm.sh $dirname/$basename.cha | sed 's/xxx/\<unk\>/g' > $dirname/$basename.stm
@@ -67,6 +68,7 @@ cat $dirname/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_
 
 
 # Generate features
+cd $BASEDIR
 rm -rf build/trans/$basename
 make SEGMENTS=show.seg build/trans/$basename/fbank
 
