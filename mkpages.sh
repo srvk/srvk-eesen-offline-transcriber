@@ -20,10 +20,10 @@ for f in `ls ${www}/video/*.mp4`; do
   echo "processing " $fn
 
   # create thumbnail - grab frame at the 1 minute mark
-  avconv -i $www/video/$fn.mp4 -ss 00:00:57.000 -vframes 1 $www/thumbs/$fn.png 2>/dev/null
+  avconv -y -i $www/video/$fn.mp4 -ss 00:00:57.000 -vframes 1 $www/thumbs/$fn.png
   if [ ! -f $www/thumbs/$fn.png ] # try 1 second mark
      then 
-     avconv -i $www/video/$fn.mp4 -ss 00:00:01.000 -vframes 1 $www/thumbs/$fn.png 2>/dev/null
+     avconv -y -i $www/video/$fn.mp4 -ss 00:00:01.000 -vframes 1 $www/thumbs/$fn.png
   fi
   # final try - give up, use dummy thumbnail image
   if [ ! -f $www/thumbs/$fn.png ] # try 1 second mark
