@@ -54,8 +54,8 @@ mkdir -p $dir/scoring/log
 if [ $stage -le 0 ]; then
   $cmd ACWT=$min_acwt:$max_acwt $dir/scoring/log/get_ctm.ACWT.log \
     mkdir -p $dir/score_ACWT/ '&&' \
-    lattice-1best --acoustic-scale=0.ACWT "ark:gunzip -c $dir/lat.*.gz|" ark:- \| \
-    lattice-add-penalty --word-ins-penalty=$word_ins_penalty ark:- ark:- \| \
+    lattice-add-penalty --word-ins-penalty=$word_ins_penalty "ark:gunzip -c $dir/lat.*.gz|" ark:- \| \
+    lattice-1best --acoustic-scale=0.ACWT ark:- ark:- \| \
     nbest-to-ctm ark:- - \| \
     utils/int2sym.pl -f 5 $symtab \
     '>' $dir/score_ACWT/$name.ctm || exit 1;
