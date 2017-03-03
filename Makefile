@@ -34,7 +34,7 @@ GRAPH_DIR?=$(EESEN_ROOT)/asr_egs/tedlium/v1/data/lang_phn_test
 MODEL_DIR?=$(EESEN_ROOT)/asr_egs/tedlium/v1/exp/train_phn_l5_c320
 
 # How many processes to use for one transcription task
-# must be more than number of speakers, which for lium segmentation is often only 1
+# must be less than number of speakers, which for lium segmentation is often only 1
 njobs ?= 1
 
 # How many threads to use in each process
@@ -49,20 +49,6 @@ export decode_cmd=run.pl
 export cuda_cmd=run.pl
 export mkgraph_cmd=run.pl
 
-# Main language model (should be slightly pruned), used for rescoring
-#LM ?=language_model/pruned.vestlused-dev.splitw2.arpa.gz
-#LM ?=language_model/cmusphinx-5.0-en-us.lm.gz
-
-
-# More aggressively pruned LM, used in decoding
-#PRUNED_LM ?=language_model/pruned5.vestlused-dev.splitw2.arpa.gz
-
-#COMPOUNDER_LM ?=language_model/compounder-pruned.vestlused-dev.splitw.arpa.gz
-
-
-# Vocabulary in dict format (no pronouncation probs for now)
-#VOCAB?=language_model/vestlused-dev.splitw2.dict
-
 # optimum experimentally determined LM weight for TEDLIUM data set
 # (produces lowest WER)
 LM_SCALE?=8
@@ -71,7 +57,7 @@ LM_SCALE?=8
 where-am-i = $(lastword $(MAKEFILE_LIST))
 THIS_DIR := $(shell dirname $(call where-am-i))
 
-#FINAL_PASS=nnet5c1_pruned_rescored_main
+# This ends up just being a folder name for output
 FINAL_PASS=eesen
 
 #LD_LIBRARY_PATH=$(KALDI_ROOT)/tools/openfst/lib
