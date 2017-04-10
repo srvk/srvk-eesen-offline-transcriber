@@ -47,5 +47,5 @@ if [ -f $dirname/$basename.cha ]; then
 
   # Convert CHATTER xml to STM
   #python scripts/parse_cha_xml.py $dirname/$basename.xml --stm --replacement
-  python ~/tools/srvk-eesen-offline-transcriber/scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
+  python ~/tools/eesen-offline-transcriber/scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
 fi
