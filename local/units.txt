@@ -1,45 +1,45 @@
-[BRH] 1
-[CGH] 2
-[NSN] 3
-[SMK] 4
-[UM] 5
-[UHH] 6
-AA 7
-AE 8
-AH 9
-AO 10
-AW 11
-AY 12
-B 13
-CH 14
-D 15
-DH 16
-EH 17
-ER 18
-EY 19
-F 20
-G 21
-HH 22
-IH 23
-IY 24
-JH 25
-K 26
-L 27
-M 28
-N 29
-NG 30
-OW 31
-OY 32
-P 33
-R 34
-S 35
-SH 36
-T 37
-TH 38
-UH 39
-UW 40
-V 41
-W 42
-Y 43
-Z 44
-ZH 45
+[BRH] [BRH] 1
+[CGH] [CGH] 2
+[NSN] [NSN] 3
+[SMK] [SMK] 4
+[UM] [UM] 5
+[UHH] [UHH] 6
+ɑ AA 7
+æ AE 8
+ʌ AH 9
+ɔ AO 10
+aʊ AW 11
+aɪ AY 12
+b B 13
+tʃ CH 14
+d D 15
+ð DH 16
+ɛ EH 17
+ɝ ER 18
+eɪ EY 19
+f F 20
+g G 21
+h HH 22
+ɪ IH 23
+i IY 24
+dʒ JH 25
+k K 26
+ɫ L 27
+m M 28
+n N 29
+ŋ NG 30
+oʊ OW 31
+ɔɪ OY 32
+p P 33
+r R 34
+s S 35
+ʃ SH 36
+t T 37
+θ TH 38
+ʊ UH 39
+u UW 40
+v V 41
+w W 42
+j Y 43
+z Z 44
+ʒ ZH 45

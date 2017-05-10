@@ -89,8 +89,10 @@ $cmd JOB=1:$nj $dir/log/decode.JOB.log \
   --acoustic-scale=$acwt --allow-partial=true --word-symbol-table=$graphdir/words.txt \
   $graphdir/TLG.fst ark:- "ark:|gzip -c > $dir/lat.JOB.gz" || exit 1;
 
-$cmd JOB=1:$nj $dir/log/decode2.JOB.log \
-     net-output-extract --class-frame-counts=$srcdir/label.counts --apply-log=true $srcdir/$mdl "$feats" ark,t:$dir/phones.JOB.txt
+# Uncomment this block to create phone likelihoods in phones.1.txt
+#
+#$cmd JOB=1:$nj $dir/log/decode2.JOB.log \
+#     net-output-extract --class-frame-counts=$srcdir/label.counts --apply-log=true $srcdir/$mdl "$feats" ark,t:$dir/phones.JOB.txt
 
 # Scoring
 if ! $skip_scoring ; then
