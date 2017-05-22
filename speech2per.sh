@@ -2,7 +2,7 @@
 
 # (based on speech2text.sh)
 #
-# Given an input audio, and a gold standard STM file containing words (as one long utterance labeled UTTERANCE)
+# Given an input audio, and a plain text file containing words,
 # produce a phonetic transcription and compute phone error rate
 # of the audio as it relates to the text file as "gold standard"
 
@@ -48,6 +48,8 @@ python local/flatphonemes.py build/trans/${hypbasename}/eesen/decode/phones.1.tx
 
 # score phonetic transcription against phonetic STM
 compute-wer --text ark:build/output/${stmbasename}.phon.stm ark:build/trans/${hypbasename}/eesen/decode/${hypbasename}.hyp build/output/${hypbasename}.dtl > build/output/${hypbasename}.sys
+
+echo ${hypbasename} `grep WER build/output/${hypbasename}.sys` >> speech2per.log
 
 rm $BASEDIR/src-audio/$hypfilename
 
