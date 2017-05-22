@@ -6,13 +6,17 @@ import sys
 
 # read in map of phoneme indices to phonemes
 
+# set field to 0 for ipa
+# or else set it to 1 for CMUDict phones
+field=1
+
 dict={}
 dict[0] = " "
 units = open("local/units.txt", 'r')
 for phoneme in units.readlines():
     phoneme = phoneme.replace('\n','').strip()
     fields = phoneme.split(' ')
-    dict[int(fields[1])] = fields[0]
+    dict[int(fields[1])] = fields[field]
 units.close()
 
 # iterate through phones file
