@@ -1,6 +1,14 @@
 #!/usr/bin/env python
+#
+# readphonemes.py
+#
+# using a map of CMUDict phones, IPA phones, and indices (local/units.txt)
+# given the output from CTC decode (decode_ctc_lat) as a list of utterances, each a list of frames, each frame
+# containing a vector of likelihoods for each phoneme, produce a sequence
+# of phonemes per utterance, squashing repetitions
 
 # Apache 2.0
+
 
 import sys
 
@@ -8,7 +16,7 @@ import sys
 
 # set field to 0 for ipa
 # or else set it to 1 for CMUDict phones
-field=1
+field=0
 
 dict={}
 dict[0] = " "
@@ -16,7 +24,7 @@ units = open("local/units.txt", 'r')
 for phoneme in units.readlines():
     phoneme = phoneme.replace('\n','').strip()
     fields = phoneme.split(' ')
-    dict[int(fields[1])] = fields[field]
+    dict[int(fields[2])] = fields[field]
 units.close()
 
 # iterate through phones file

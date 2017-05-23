@@ -40,6 +40,8 @@ nnet2_online_arg="DO_NNET2_ONLINE=no"
 
 (cd $BASEDIR; make build/output/${hypbasename%.*}.{txt,trs,ctm,sbv,srt,labels} || exit 1; if $clean ; then make .${hypbasename%.*}.clean; fi)
 
+cd $BASEDIR
+
 # if not exist, create gold phonetic STM
 local/words2phon.sh $1 | paste -s -d ' ' > build/output/${stmbasename}.phon.stm
 
@@ -47,9 +49,11 @@ local/words2phon.sh $1 | paste -s -d ' ' > build/output/${stmbasename}.phon.stm
 python local/flatphonemes.py build/trans/${hypbasename}/eesen/decode/phones.1.txt > build/trans/${hypbasename}/eesen/decode/${hypbasename}.hyp
 
 # score phonetic transcription against phonetic STM
-compute-wer --text ark:build/output/${stmbasename}.phon.stm ark:build/trans/${hypbasename}/eesen/decode/${hypbasename}.hyp build/output/${hypbasename}.dtl > build/output/${hypbasename}.sys
+compute-wer --text ark:build/output/${stmbasename}.phon.stm ark:build/trans/${hypbasename}/eesen/decode/${hypbasename}.hyp build/output/${hypbasename}.dtl > build/output/${hypbasename}.phon.sys
+# fix 'WER' to read 'PER" since these are phones
+sed -i 's/WER/PER/g' build/output/${hypbasename}.phon.sys
 
-echo ${hypbasename} `grep WER build/output/${hypbasename}.sys` >> speech2per.log
+echo ${hypbasename} `grep PER build/output/${hypbasename}.sys` >> speech2per.log
 
 rm $BASEDIR/src-audio/$hypfilename
 

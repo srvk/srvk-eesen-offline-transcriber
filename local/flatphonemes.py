@@ -5,7 +5,8 @@
 # using a map of CMUDict phones, IPA phones, and indices (local/units.txt)
 # given the output of CTC decode as a list of frames, each frame
 # containing a vector of likelihoods for each phoneme, produce a sequence
-# of phonemes as one long utterance, squashing repetitions, in
+# of phonemes as one long utterance, squashing repetitions, and
+# suppressing non-speech sounds ([BRH],[CGH],[NSN],[SMK],[UM],[UHH]) in
 # hypothesis (.hyp) format
 
 # Apache 2.0
@@ -58,7 +59,8 @@ for frame in fread.readlines():
         c = dict[max_index]
         if c != lastPrinted:
             if c != " ":
-                # suppress non-speech noises
+                # suppress non-speech noises which have
+                # indices higher than 6 in units.txt
                 if (max_index > 6):
                     sys.stdout.write(" "+c)
                 lastPrinted = c
