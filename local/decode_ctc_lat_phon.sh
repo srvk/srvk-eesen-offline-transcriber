@@ -82,17 +82,16 @@ $splice_feats && feats="$feats splice-feats --left-context=1 --right-context=1 a
 $subsample_feats && feats="$feats subsample-feats --n=3 --offset=0 ark:- ark:- |"
 ##
 
-# Decode for each of the acoustic scales
-$cmd JOB=1:$nj $dir/log/decode.JOB.log \
-  net-output-extract --class-frame-counts=$srcdir/label.counts --apply-log=true $srcdir/$mdl "$feats" ark:- \| \
+# Decode acoustic frames as phone likelihoods to disk
+$cmd JOB=1:$nj $dir/log/decode2.JOB.log \
+     net-output-extract --class-frame-counts=$srcdir/label.counts --apply-log=true $srcdir/$mdl "$feats" ark,t:$dir/phones.JOB.txt
+
+# Generate lattices from acoustic frames
+$cmd JOB=1:$nj $dir/log/decode3.JOB.log \
   latgen-faster  --max-active=$max_active --max-mem=$max_mem --beam=$beam --lattice-beam=$lattice_beam \
   --acoustic-scale=$acwt --allow-partial=true --word-symbol-table=$graphdir/words.txt \
-  $graphdir/TLG.fst ark:- "ark:|gzip -c > $dir/lat.JOB.gz" || exit 1;
+  $graphdir/TLG.fst ark,t:$dir/phones.JOB.txt "ark:|gzip -c > $dir/lat.JOB.gz" || exit 1;
 
-# Uncomment this block to create phone likelihoods in phones.1.txt
-#
-#$cmd JOB=1:$nj $dir/log/decode2.JOB.log \
-#     net-output-extract --class-frame-counts=$srcdir/label.counts --apply-log=true $srcdir/$mdl "$feats" ark,t:$dir/phones.JOB.txt
 
 # Scoring
 if ! $skip_scoring ; then
