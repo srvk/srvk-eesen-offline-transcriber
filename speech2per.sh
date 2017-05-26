@@ -53,7 +53,7 @@ compute-wer --text ark:build/output/${stmbasename}.phon.stm ark:build/trans/${hy
 # fix 'WER' to read 'PER" since these are phones
 sed -i 's/WER/PER/g' build/output/${hypbasename}.phon.sys
 
-echo ${hypbasename} `grep PER build/output/${hypbasename}.phon.sys` >> speech2per.log
+echo ${hypbasename} `grep PER build/output/${hypbasename}.phon.sys` >> build/output/speech2per.log
 
 rm $BASEDIR/src-audio/$hypfilename
 
