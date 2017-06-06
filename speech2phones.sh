@@ -56,7 +56,7 @@ python local/readphonemes.py build/trans/${basename}/eesen/decode/phones.1.txt >
 
 rm $BASEDIR/src-audio/$filename
 
-echo "Finished transcribing, result is in files $BASEDIR/build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels}"
+echo "Finished transcribing, result is in files $BASEDIR/build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels,phones}"
 
 if [ ! -z $txt ]; then
  cp $BASEDIR/build/output/${basename%.*}.txt $txt
