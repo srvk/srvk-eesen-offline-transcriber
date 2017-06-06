@@ -14,6 +14,7 @@ nthreads=""
 nnet2_online=false
 
 . $BASEDIR/utils/parse_options.sh || exit 1;
+. $BASEDIR/path.sh
 
 if [ $# -ne 1 ]; then
   echo "Usage: speech2text [options] <audiofile>"
