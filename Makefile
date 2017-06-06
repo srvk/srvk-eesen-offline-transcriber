@@ -169,7 +169,7 @@ build/trans/%/spk2utt: build/trans/%/utt2spk
 #	make build/trans/myvideo/fbank
 #   note the % pattern matches e.g. myvideo
 build/trans/%/fbank: build/trans/%/spk2utt
-	rm -rf $@
+	rm -rf $@ build/trans/$*/cmvn.scp
 	steps/$(fbank).sh --fbank-config conf/fbank.$(sample_rate).conf --cmd "$$train_cmd" --nj 1 \
 		build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
 	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
