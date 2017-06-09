@@ -84,8 +84,16 @@ build/audio/base/%.wav: src-audio/%.sph
 build/audio/base/%.wav: src-audio/%.wav
 	mkdir -p `dirname $@`
 	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
+	
+build/audio/base/%.wav: src-audio/%.WAV
+	mkdir -p `dirname $@`
+	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp3
+	mkdir -p `dirname $@`
+	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	
+build/audio/base/%.wav: src-audio/%.MP3
 	mkdir -p `dirname $@`
 	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
@@ -103,6 +111,13 @@ build/audio/base/%.wav: src-audio/%.m4a
 #	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 $@ rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp4
+	mkdir -p `dirname $@`
+#	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@ 
+	echo "converted audio"
+	date +%s%N | cut -b1-13
+	
+build/audio/base/%.wav: src-audio/%.MP4
 	mkdir -p `dirname $@`
 #	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@ 
