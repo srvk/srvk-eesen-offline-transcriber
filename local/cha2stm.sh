@@ -7,6 +7,8 @@
 # To have this use replacement words instead of marking OOV words as "<unk>"
 # swap (uncomment) the last line to change the arguments to parse_cha_xml.sh
 
+BASEDIR=$(dirname $0)
+
 if [ $# -ne 1 ]; then
   echo "Usage: cha2stm.sh <basename>.cha"
   echo
@@ -47,5 +49,5 @@ if [ -f $dirname/$basename.cha ]; then
 
   # Convert CHATTER xml to STM
   #python scripts/parse_cha_xml.py $dirname/$basename.xml --stm --replacement
-  python ~/tools/eesen-offline-transcriber/scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
+  python $BASEDIR/../scripts/parse_cha_xml.py $dirname/$basename.xml --stm --oov
 fi
