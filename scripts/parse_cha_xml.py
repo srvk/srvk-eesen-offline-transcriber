@@ -1,9 +1,9 @@
 #!/usr/bin/python
 #
-# stripchat.py
+# parse_cha_xml.py
 #
-# Print out 'only the words' that are found in a CHATTER format xml (http://talkbank.org/software/chatter.html)
-# supplied as an argument, or via a pipe
+# Given CHATTER format xml (http://talkbank.org/software/chatter.html)
+# supplied as an argument, or via a pipe, print out STM format text
 #
 # To toggle whether UNIBET words are printed out, or instead appear as "<unk>"
 # set the switch --oov.  To instead print their replacements, set the switch --replacment
