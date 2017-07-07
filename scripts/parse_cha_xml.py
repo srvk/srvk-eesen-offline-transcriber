@@ -1,14 +1,21 @@
 #!/usr/bin/python
 #
-# stripchat.py
+# parse_cha_xml.py
 #
-# Print out 'only the words' that are found in a CHATTER format xml (http://talkbank.org/software/chatter.html)
-# supplied as an argument, or via a pipe
+# Given CHATTER format xml (http://talkbank.org/software/chatter.html)
+# supplied as an argument, or via a pipe, print out STM format text
 #
 # To toggle whether UNIBET words are printed out, or instead appear as "<unk>"
 # set the switch --oov.  To instead print their replacements, set the switch --replacment
 #
 # usage ./parse_cha_xml.py P1_6W_SE_C6.xml
+#
+# Change Log: 
+# - added handling of "happening" and formType elements
+#   to support things like "singing", yell, shout etc.
+# - added metadata for speaker e.g. <name,sex,role> as
+#   found in 'participant' tags
+
 from xml.dom.minidom import parse
 import sys,argparse,os
 
@@ -23,12 +30,16 @@ parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), help='CHAT
                     default=sys.stdin)
 args=parser.parse_args()
 
+# a table of speaker IDs and related metadata
+
 infile = args.infile.name
 if infile == '<stdin>':
     dom = parse(sys.stdin)
 else:
     dom = parse(infile)
 utts = dom.getElementsByTagName('u') # utterances
+participants = dom.getElementsByTagName('participant')
+
 oov = args.oov
 stm = args.stm
 replace = args.replacement
@@ -37,6 +48,26 @@ replace = args.replacement
 recording = os.path.splitext(os.path.basename(infile))[0]
 
 #utterance = ""
+
+parts = {}
+for part in participants:
+    label = "<"; ident = ""
+    name = ""; role = ""; sex = "u"
+    for key in part.attributes.keys():
+        if key == "id":
+            ident = part.attributes[key].nodeValue.encode('utf8')
+        if key == "name": 
+            name = part.attributes[key].nodeValue.encode('utf8')
+            name = name.replace(" ","")
+        if key == "role":
+            role = part.attributes[key].nodeValue.encode('utf8')
+            role = role.replace(" ","")
+        if key == "sex":
+            sex = part.attributes[key].nodeValue.encode('utf8')
+            if sex == "male": sex = "m"
+            if sex == "female": sex = "f"
+    parts[ident]=("<"+name+","+sex+","+role+">").lower()
+#    print parts[ident]
 
 # add the word found inside node passed in as argument
 def addWord( node ):
@@ -75,10 +106,15 @@ def addUnibetOrReplacement( node ):
                 addWord( node )
         if key == "type" and (node.attributes[key].nodeValue == "fragment"):
             utterance += " " + node.firstChild.nodeValue
-        if key == "formType" and node.attributes[key].nodeValue == "UNIBET":
-            if replace:
-                addReplacement( node )
-            else:
+        if key == "formType":
+            if node.attributes[key].nodeValue == "UNIBET":
+                if replace:
+                    addReplacement( node )
+                else:
+                    addWord( node )
+            else: # for all other form types
+                  # e.g. singing, babbling, kana, onomotapoeia, family-specific, letter, child-invented
+                  # output word
                 addWord( node )
 
 for utt in utts:
@@ -101,10 +137,11 @@ for utt in utts:
                     if stm:
                         # Don't output if start == end; confuses downstream systems
                         if start != end:
-                            print spk_reco_clause+" "+start+" "+end+" <parse_cha_xml>"+utterance.lower()
+                            print spk_reco_clause+" "+start+" "+end+" "+parts[speaker]+\
+                              utterance.lower().replace("_"," ").replace("-","")
                         sys.stdout.flush()
                     else: 
-                        print utterance.lower()
+                        print utterance.lower().replace("_"," ").replace("-","")
                         sys.stdout.flush()
                     utterance = ""
         # tb:wordType ("<w>" tag)
@@ -119,8 +156,15 @@ for utt in utts:
                         addWord( word )
             else:
                 addUnibetOrReplacement( word )
-        # tb:groupType ("<g>" tag):
-        if word.nodeType == word.ELEMENT_NODE and word.tagName == 'g':
+        # tb:element type ("<e>" tag):
+        if word.nodeType == word.ELEMENT_NODE and word.tagName == 'e':
+            for wordlet in word.childNodes:
+                if wordlet.nodeType == wordlet.ELEMENT_NODE and wordlet.tagName == 'happening':
+                    for txt in wordlet.childNodes:
+                        thetxt = txt.nodeValue
+                        utterance += " <" + thetxt.encode('utf8') + ">"
+        # tb:groupType or phoneticGroupType ("<g>" or "<pg>" tag):
+        if word.nodeType == word.ELEMENT_NODE and (word.tagName == 'g' or word.tagName == 'pg'):
             for group in word.childNodes:
                 if group.nodeType == group.ELEMENT_NODE and group.tagName == 'w':
                     if len(group.attributes.keys())==0:
