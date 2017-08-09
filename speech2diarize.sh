@@ -18,7 +18,7 @@ nnet2_online=false
 . path.sh
 
 if [ $# -ne 1 ]; then
-  echo "Usage: speech2text [options] <audiofile>"
+  echo "Usage: speech2diarize [options] <audiofile>"
   echo "Options:"
   echo "  --nthreads <n>        # Use <n> threads in parallel for decoding"
   echo "  --txt <txt-file>      # Put the result in a simple text file"
