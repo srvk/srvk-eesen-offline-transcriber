@@ -33,8 +33,9 @@ fread = open(sys.argv[1], 'r')
 framesize = sys.argv[2]
 
 lastPrinted = " "
-phoneTimeSum = 0.0
-uttTimeSum = 0.0
+oldPhoneme = " "
+phoneDuration = 0.0
+timeSinceUttBegin = 0.0
 utteranceID = ""
 
 for frame in fread.readlines():
@@ -47,8 +48,9 @@ for frame in fread.readlines():
         speakerID = splits[1]
         utteranceID = likelihoods[0] + " " + speakerID + " "
         lastPrinted = " "
-        phoneTimeSum = 0.0
-        uttTimeSum = 0.0
+        phoneDuration = 0.0
+        timeSinceUttBegin = 0.0
+        phoneStartTime = 0.0
     else:
         # the last element might be "]"
         if len(likelihoods) == 47:
@@ -56,16 +58,34 @@ for frame in fread.readlines():
             
         max_value = max(likelihoods)
         max_index = likelihoods.index(max_value)
-
         c = dict[max_index]
-        phoneTimeSum = phoneTimeSum + float(framesize)
-        if c != lastPrinted:
-            if c != " ":
+
+        # running total
+        timeSinceUttBegin += float(framesize)
+        if c != lastPrinted and c != oldPhoneme:
+            if (oldPhoneme != " "):
+                # emit 'old' one
                 sys.stdout.write(utteranceID),
-                sys.stdout.write(c) #+":"+str(phoneTimeSum),
-                sys.stdout.write(" " + str(uttTimeSum) + " " + str(phoneTimeSum) + "\n")
-                lastPrinted = c
-                uttTimeSum = uttTimeSum + phoneTimeSum
-                phoneTimeSum = 0.0
+                sys.stdout.write(oldPhoneme) #+":"+str(phoneTimeSum),
+                # output the 'old' phoneme and compute it's start & cumulative time
+                sys.stdout.write(" " + str(phoneStartTime) + " " + str(phoneDuration) + "\n")
+                lastPrinted = oldPhoneme
+                oldPhoneme = " "
+
+            # new phoneme but might be repeated
+            # Save this phoneme as the new 'old' one and save it's start time
+            if (c != " "):
+                oldPhoneme = c;
+                phoneStartTime = timeSinceUttBegin
+                phoneDuration = float(framesize);
+        elif c == oldPhoneme:
+            phoneDuration += float(framesize)
+
+# possibly output the last one
+if (oldPhoneme != " "):
+    sys.stdout.write(utteranceID),
+    sys.stdout.write(oldPhoneme) #+":"+str(phoneTimeSum),
+    # output the 'old' phoneme and compute it's start & cumulative time
+    sys.stdout.write(" " + str(phoneStartTime) + " " + str(phoneDuration) + "\n")
 
 fread.close()
