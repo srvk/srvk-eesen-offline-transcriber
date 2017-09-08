@@ -15,8 +15,10 @@ nnet2_online=false
 
 . $BASEDIR/utils/parse_options.sh || exit 1;
 
+. path.sh
+
 if [ $# -ne 1 ]; then
-  echo "Usage: speech2text [options] <audiofile>"
+  echo "Usage: speech2diarize [options] <audiofile>"
   echo "Options:"
   echo "  --nthreads <n>        # Use <n> threads in parallel for decoding"
   echo "  --txt <txt-file>      # Put the result in a simple text file"
@@ -48,11 +50,7 @@ if $nnet2_online; then
   nnet2_online_arg="DO_NNET2_ONLINE=yes"
 fi
 
-(cd $BASEDIR; make $nthreads_arg $nnet2_online_arg build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels} || exit 1; if $clean ; then make .${basename%.*}.clean; fi)
-
-# put phonetic transcription in output folder (not part of Makefile)
-#(cd $BASEDIR
-#python local/readphonemes.py build/trans/${basename}/eesen/decode/phones.1.txt > build/output/${basename}.phones)
+(cd $BASEDIR; make $nthreads_arg $nnet2_online_arg build/diarization/${basename}/show.seg || exit 1; if $clean ; then make .${basename%.*}.clean; fi)
 
 rm $BASEDIR/src-audio/$filename
 
@@ -82,4 +80,3 @@ fi
 if [ ! -z $labels ]; then
  cp $BASEDIR/build/output/${basename%.*}.labels $labels
 fi
-

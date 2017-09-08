@@ -44,7 +44,7 @@ mkdir -p build/trans/$basename
 if [ -f $dirname/$basename.cha ]; then
   echo "CHA file found: " $dirname/$basename.cha
   # creates $basename.stm
-  local/cha2stm.sh $dirname/$basename.cha
+  local/cha2stm.sh $dirname/$basename.cha > build/trans/$basename/$basename.stm
 
 
 elif [ -f $dirname/$basename.stm ]; then
@@ -56,4 +56,7 @@ fi
 # code from run-scored.sh to create show.seg from .STM
 cat build/trans/$basename/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_segment_in_scoring" | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
 
-make build/output/$basename.{txt,trs,ctm,sbv,srt,labels}
+make SEGMENTS=show.seg build/output/$basename.{txt,trs,ctm,sbv,srt,labels}
+
+# put phonetic transcription in output folder (not part of Makefile)
+#python local/readphonemes.py build/trans/${basename}/eesen/decode/phones.1.txt > build/output/${basename}.phones

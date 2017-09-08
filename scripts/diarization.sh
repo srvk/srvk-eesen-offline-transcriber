@@ -102,10 +102,15 @@ $java -Xmx1024m -classpath "$LOCALCLASSPATH" fr.lium.spkDiarization.programs.MSe
  --kind=FULL --sMethod=GLR  --fInputMask=$features --fInputDesc=$fInputDesc --sInputMask=./$datadir/show.i.seg \
 --sOutputMask=./$datadir/show.s.seg  $show
 
-# save time; skip remaining steps
-if [ $3 == "show.s.seg" ]; 
-  then exit;
+# save time; skip remaining steps                                                                                                    
+if [ $3 == "show.s.seg" ]; then
+    # dump segments smaller than 3                                                                                                   
+    cat ./$datadir/show.s.seg | awk '{ if ($4 > 2) print $0 }' >./$datadir/show.tmp
+    rm ./$datadir/show.s.seg
+    mv ./$datadir/show.tmp ./$datadir/show.s.seg
+    exit;
 fi
+
  
 # Linear clustering, fuse consecutive segments of the same speaker from the start to the end
 $java -Xmx1024m -classpath "$LOCALCLASSPATH" fr.lium.spkDiarization.programs.MClust  $trace --help \

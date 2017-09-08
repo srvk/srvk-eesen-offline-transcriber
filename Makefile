@@ -34,7 +34,7 @@ GRAPH_DIR?=$(EESEN_ROOT)/asr_egs/tedlium/v1/data/lang_phn_test
 MODEL_DIR?=$(EESEN_ROOT)/asr_egs/tedlium/v1/exp/train_phn_l5_c320
 
 # How many processes to use for one transcription task
-# must be more than number of speakers, which for lium segmentation is often only 1
+# must be less than number of speakers, which for lium segmentation is often only 1
 njobs ?= 1
 
 # How many threads to use in each process
@@ -49,20 +49,6 @@ export decode_cmd=run.pl
 export cuda_cmd=run.pl
 export mkgraph_cmd=run.pl
 
-# Main language model (should be slightly pruned), used for rescoring
-#LM ?=language_model/pruned.vestlused-dev.splitw2.arpa.gz
-#LM ?=language_model/cmusphinx-5.0-en-us.lm.gz
-
-
-# More aggressively pruned LM, used in decoding
-#PRUNED_LM ?=language_model/pruned5.vestlused-dev.splitw2.arpa.gz
-
-#COMPOUNDER_LM ?=language_model/compounder-pruned.vestlused-dev.splitw.arpa.gz
-
-
-# Vocabulary in dict format (no pronouncation probs for now)
-#VOCAB?=language_model/vestlused-dev.splitw2.dict
-
 # optimum experimentally determined LM weight for TEDLIUM data set
 # (produces lowest WER)
 LM_SCALE?=8
@@ -71,7 +57,7 @@ LM_SCALE?=8
 where-am-i = $(lastword $(MAKEFILE_LIST))
 THIS_DIR := $(shell dirname $(call where-am-i))
 
-#FINAL_PASS=nnet5c1_pruned_rescored_main
+# This ends up just being a folder name for output
 FINAL_PASS=eesen
 
 #LD_LIBRARY_PATH=$(KALDI_ROOT)/tools/openfst/lib
@@ -98,8 +84,16 @@ build/audio/base/%.wav: src-audio/%.sph
 build/audio/base/%.wav: src-audio/%.wav
 	mkdir -p `dirname $@`
 	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
+	
+build/audio/base/%.wav: src-audio/%.WAV
+	mkdir -p `dirname $@`
+	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp3
+	mkdir -p `dirname $@`
+	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	
+build/audio/base/%.wav: src-audio/%.MP3
 	mkdir -p `dirname $@`
 	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
@@ -117,6 +111,13 @@ build/audio/base/%.wav: src-audio/%.m4a
 #	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 $@ rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp4
+	mkdir -p `dirname $@`
+#	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@ 
+	echo "converted audio"
+	date +%s%N | cut -b1-13
+	
+build/audio/base/%.wav: src-audio/%.MP4
 	mkdir -p `dirname $@`
 #	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@ 
@@ -183,7 +184,7 @@ build/trans/%/spk2utt: build/trans/%/utt2spk
 #	make build/trans/myvideo/fbank
 #   note the % pattern matches e.g. myvideo
 build/trans/%/fbank: build/trans/%/spk2utt
-	rm -rf $@
+	rm -rf $@ build/trans/$*/cmvn.scp
 	steps/$(fbank).sh --fbank-config conf/fbank.$(sample_rate).conf --cmd "$$train_cmd" --nj 1 \
 		build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
 	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
@@ -197,7 +198,7 @@ build/trans/%/fbank: build/trans/%/spk2utt
 build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	rm -rf build/trans/$*/eesen && mkdir -p build/trans/$*/eesen
 #	(cd build/trans/$*/eesen; for f in $(MODEL_DIR)/*; do ln -s $$f; done)
-	steps/decode_ctc_lat.sh --cmd "$$decode_cmd" --nj $(njobs) --beam 17.0 \
+	local/decode_ctc_lat_phon.sh --cmd "$$decode_cmd" --nj $(njobs) --beam $(BEAM) \
 	--lattice_beam 8.0 --max-active 5000 --skip_scoring true \
 	--acwt $(ACWT) $(GRAPH_DIR) build/trans/$* `dirname $@` $(MODEL_DIR) || exit 1;
 
