@@ -40,6 +40,8 @@ if [ $# -ne 1 ]; then
   exit 1;
 fi
 
+mkdir -p $BASEDIR/build/audio/base build/output
+
 DIRNAME=$(dirname $1)
 
 nthreads_arg=""

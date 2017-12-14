@@ -27,6 +27,8 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
+mkdir -p $BASEDIR/build/audio/base build/output
+
 # Requires <basename>.xml CHATTER-ified conversion of <basename>.cha
 if [ ! -f $dirname/$basename.xml ]; then
  ~/bin/lib/zulu8.17.0.3-jdk8.0.102-linux_x64/bin/java -cp lib/chatter.jar org.talkbank.chatter.App -inputFormat cha -outputFormat xml -output build/trans/$basename/$basename.xml /vagrant/$basename.cha
