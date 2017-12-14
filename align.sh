@@ -60,11 +60,21 @@ make $BASEDIR/build/audio/base/$basename.wav
 mkdir -p $BASEDIR/build/diarization/$basename
 # make STM from cha
 if [ -f $dirname/$basename.cha -a ! -f $dirname/$basename.stm ]; then
-  local/cha2stm.sh $dirname/$basename.cha | sed 's/xxx/\<unk\>/g' > $dirname/$basename.stm
+  local/cha2stm.sh $dirname/$basename.cha | sed 's/xxx/\<unk\>/g' > build/output/$basename.stm
+elif [ -f $dirname/$basename.stm ]; then
+  cp $dirname/$basename.stm build/output/
+elif [ ! -f $dirname/$basename.stm ]; then
+  echo "Needs either a .cha or .stm file to get utterances"
+  exit 1
 fi
 
+#if [ ! -f $dirname/$basename.txt ]; then
+#  echo "Needs .txt file with utterance per line as reference text to align"
+#  exit 1
+#fi
+
 # make segments from $1.stm
-cat $dirname/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_segment_in_scoring" | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
+cat build/output/$basename.stm | grep -v "inter_segment_gap" | grep -v "ignore_time_segment_in_scoring" | awk '{OFMT = "%.0f"; print $1,$2,$4*100,($5-$4)*100,"M S U",$2}' > build/diarization/$basename/show.seg
 
 
 # Generate features
@@ -74,15 +84,15 @@ make SEGMENTS=show.seg build/trans/$basename/fbank
 
 # Expect test text in format with utterance IDs per line
 uttdata=build/trans/$basename
-if [ -f $dirname/$basename.txt ];
-  then
-    echo "Aligning text found at $dirname/$basename.txt"
-    cat $dirname/$basename.txt | awk '{print NR" "$0}' > $uttdata/text
-  else
-    echo "Aligning text found in $dirname/$basename.stm"
-    cat $dirname/$basename.stm | awk '{$1="";$2="";$3="";$4="";$5="";$6=""; print NR$0}' \
+#if [ -f $dirname/$basename.txt ];
+#  then
+#    echo "Aligning text found at $dirname/$basename.txt"
+#    cat $dirname/$basename.txt | awk '{print NR" "$0}' > $uttdata/text
+#  else
+    echo "Aligning text found in build/output/$basename.stm"
+    cat build/output/$basename.stm | awk '{$1="";$2="";$3="";$4="";$5="";$6=""; print NR$0}' \
 	| sed 's/ \+/ /' > $uttdata/text
-fi
+#fi
 cp build/diarization/$basename/show.seg $uttdata
 
 #local/align_ctc_multi_utts.sh --acoustic_scale 0.8 $GRAPH_DIR $GRAPH_DIR $uttdata  $MODEL_DIR $uttdata/align
