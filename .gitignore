@@ -1,0 +1,6 @@
+.gitignore*
+build
+lib/
+src-audio
+steps
+utils
