@@ -60,7 +60,7 @@ if $nnet2_online; then
   nnet2_online_arg="DO_NNET2_ONLINE=yes"
 fi
 
-(cd $BASEDIR; make $nthreads_arg $nnet2_online_arg build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels} || exit 1; if $clean ; then make .${basename%.*}.clean; fi)
+(cd $BASEDIR; make $nthreads_arg $nnet2_online_arg build/output/${basename%.*}.{txt,ctm} || exit 1; if $clean ; then make .${basename%.*}.clean; fi)
 
 # put phonetic transcription in output folder (not part of Makefile)
 cd $BASEDIR
