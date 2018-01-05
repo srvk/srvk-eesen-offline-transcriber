@@ -27,6 +27,8 @@ for phoneme in units.readlines():
     dict[int(fields[2])] = fields[field]
 units.close()
 
+firsttime=True
+
 # iterate through phones file
 
 fread = open(sys.argv[1], 'r')
@@ -38,9 +40,13 @@ for frame in fread.readlines():
     frame = frame.replace('\n','').strip()
     likelihoods = frame.split(' ')
 
-    if len(likelihoods) == 3:
-        print "\nutterance ID: ",
-        print likelihoods[0]
+    if len(likelihoods) == 3: # contains utterance ID
+        #print "\nutterance ID: ",
+        if not firsttime:
+            print
+        else:
+            firsttime = False
+        print likelihoods[0] + " ",
         lastPrinted = " "
         count = 1
     else:
@@ -59,10 +65,11 @@ for frame in fread.readlines():
                 # spaces to indicate time duration
                 #for i in range(0, count):
                 #    sys.stdout.write(' ')
-                sys.stdout.write(c) #+":"+str(count),
-                sys.stdout.write(" ")
-                lastPrinted = c
-                count = 1
+                if '[' not in c:
+                    sys.stdout.write(c) #+":"+str(count),
+                    sys.stdout.write(" ")
+                    lastPrinted = c
+                    count = 1
 
 print
 fread.close()
