@@ -40,7 +40,8 @@ basename="${filename%.*}"
 
 # put phonetic transcription in output folder (not part of Makefile)
 cd $BASEDIR
-python local/readphonemes.py build/trans/${basename}/eesen/decode/phones.1.txt > build/output/${basename}.phones
+python local/readphonemes.py build/trans/${basename}/eesen/decode/phones.1.txt | sort -n -t '-' -k5 > build/output/${basename}.phones
+# needs numeric sorted by timestamp!
 
 rm $BASEDIR/src-audio/$filename
 

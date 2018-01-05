@@ -64,11 +64,11 @@ fi
 
 # put phonetic transcription in output folder (not part of Makefile)
 cd $BASEDIR
-python local/readphonemesctm.py build/trans/${basename}/eesen/decode/phones.1.txt ${framesize} > build/output/${basename}.phones.ctm
+python local/readphonemesctm.py build/trans/${basename}/eesen/decode/phones.1.txt ${framesize} | sort -n -t '-' -k5 > build/output/${basename}.phones.ctm
 
 rm $BASEDIR/src-audio/$filename
 
-echo "Finished transcribing, result is in files $BASEDIR/build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels,phones}"
+echo "Finished transcribing, result is in files $BASEDIR/build/output/${basename%.*}.phones.ctm"
 
 if [ ! -z $txt ]; then
  cp $BASEDIR/build/output/${basename%.*}.txt $txt
