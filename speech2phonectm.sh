@@ -64,7 +64,7 @@ fi
 
 # put phonetic transcription in output folder (not part of Makefile)
 cd $BASEDIR
-python local/readphonemesctm.py build/trans/${basename}/eesen/decode/phones.1.txt ${framesize} | sort -n -t '-' -k5 > build/output/${basename}.phones.ctm
+python local/readphonemesctm.py build/trans/${basename}/eesen/decode/phones.1.txt ${framesize} | sed -e 's/-/ /g' | sort -n -k3 -k7  > build/output/${basename}.phones.ctm
 
 rm $BASEDIR/src-audio/$filename
 
