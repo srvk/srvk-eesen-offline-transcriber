@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # parse_cha_xml.py
 #
 # Given CHATTER format xml (http://talkbank.org/software/chatter.html)
@@ -11,6 +9,7 @@
 # usage ./parse_cha_xml.py P1_6W_SE_C6.xml
 #
 # Change Log: 
+# 17 Jan 2018 - print plaintext utterances even if no timecode present
 # - added handling of "happening" and formType elements
 #   to support things like "singing", yell, shout etc.
 # - added metadata for speaker e.g. <name,sex,role> as
@@ -120,6 +119,7 @@ def addUnibetOrReplacement( node ):
 for utt in utts:
     utterance = ""
     start = 0
+    has_timecode = False
     # speaker
     for key in utt.attributes.keys():
         if key == "who":
@@ -129,6 +129,7 @@ for utt in utts:
     for word in utt.childNodes:
         # time code
         if word.nodeType == word.ELEMENT_NODE and word.tagName == 'media':
+            has_timecode = True
             for key in word.attributes.keys():
                 if key == "start":
                     start = word.attributes[key].nodeValue
@@ -144,6 +145,7 @@ for utt in utts:
                         print utterance.lower().replace("_"," ").replace("-","")
                         sys.stdout.flush()
                     utterance = ""
+
         # tb:wordType ("<w>" tag)
         if word.nodeType == word.ELEMENT_NODE and word.tagName == 'w':
             if len(word.attributes.keys())==0:
@@ -181,3 +183,9 @@ for utt in utts:
                             utterance += " " + "<unk>"
                         else:
                             addUnibetOrReplacement( group )
+    # done with utterance. if it had no timecode, was not printed(!) so
+    # print now
+    if not has_timecode:
+        print utterance.lower().replace("_"," ").replace("-","")
+        sys.stdout.flush()
+        utterance = ""
