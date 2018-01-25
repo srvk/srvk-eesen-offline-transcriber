@@ -37,7 +37,7 @@ for l in sys.stdin:
             if word != '<#s>': text = word
             begin = starttime
 
-    elif re.match(";.*") or re.match("#.*"):
+    elif re.match(";.*", l) or re.match("#.*", l):
         pass
 
     else:
