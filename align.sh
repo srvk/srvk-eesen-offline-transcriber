@@ -4,7 +4,7 @@
 # Apache 2.0
 
 # Prepare data for, and run align_ctc_utts.sh script that generates word-level alignments
-# in an "Eesen Transccriber-centric" way  output is found in build/trans/<basename>/align/ali
+# in an "Eesen Transccriber-centric" way  output is found in build/output/<basename>.ali
 
 # Required inputs:
 #
