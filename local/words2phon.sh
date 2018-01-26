@@ -10,7 +10,9 @@ dirname=$(dirname "$1")
 extension="${filename##*.}"
 basename="${filename%.*}"
 
-cp -f $1 words2phon.tmp
+#cp -f $1 words2phon.tmp
+# remove punctuation
+sed -e 's/[\.\,]//g' $1 > words2phon.tmp
 
 printf "UTTERANCE "
 curl -s `curl -s -F "wordfile=@words2phon.tmp" http://www.speech.cs.cmu.edu/cgi-bin/tools/logios/lextool.pl | awk ' /DICT/ { print $3 } '` | sed 's/\t/ , /g' | awk '{tab=0; for (i=1; i<=NF; i++) {if ($i==",") tab=1; if ((tab==1) && ($i!=",")) printf($i " ")}; print ""}' | tr -s ' '
