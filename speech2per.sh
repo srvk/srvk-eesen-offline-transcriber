@@ -2,7 +2,7 @@
 
 # (based on speech2text.sh)
 #
-# Given an input audio, and a plain text file containing words,
+# Given a plain text file containing words, and an input audio,
 # produce a phonetic transcription and compute phone error rate
 # of the audio as it relates to the text file as "gold standard"
 
@@ -18,13 +18,12 @@ ctm=""
 sbv=""
 srt=""
 clean=false
-nthreads=""
 nnet2_online=false
 
 . $BASEDIR/utils/parse_options.sh || exit 1;
 
 if [ $# -ne 2 ]; then
-  echo "Usage: speech2per <stmfile> <audiofile>"
+  echo "Usage: speech2per <text> <audiofile>"
   exit 1;
 fi
 
