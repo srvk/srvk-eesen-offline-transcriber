@@ -83,11 +83,11 @@ build/audio/base/%.wav: src-audio/%.sph
 
 build/audio/base/%.wav: src-audio/%.wav
 	mkdir -p `dirname $@`
-	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
+	sox $^ -c 1 -b 16 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.WAV
 	mkdir -p `dirname $@`
-	sox $^ -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
+	sox $^ -c 1 -b 16 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp3
 	mkdir -p `dirname $@`
@@ -107,10 +107,14 @@ build/audio/base/%.wav: src-audio/%.mp2
 	mkdir -p `dirname $@`
 	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
+build/audio/base/%.wav: src-audio/%.wma
+	mkdir -p `dirname $@`
+	/data/ASR1/tools/ffmpeg-2.5.3/ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -b 16 -r $(sample_rate) $@
+
 build/audio/base/%.wav: src-audio/%.m4a
 	mkdir -p `dirname $@`
 	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@
-#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 $@ rate -v $(sample_rate)
+#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -b 16 $@ rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.mp4
 	mkdir -p `dirname $@`
@@ -133,13 +137,13 @@ build/audio/base/%.wav: src-audio/%.flac
 build/audio/base/%.wav: src-audio/%.amr
 	mkdir -p `dirname $@`
 	amrnb-decoder $^ $@.tmp.raw
-	sox -s -2 -c 1 -r 8000 $@.tmp.raw -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	sox -s -b 16 -c 1 -r 8000 $@.tmp.raw -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 	rm $@.tmp.raw
 
 build/audio/base/%.wav: src-audio/%.mpg
 	mkdir -p `dirname $@`
-	avconv -i $^ -f sox - | sox -t sox - -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
-#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -2 build/audio/base/$*.wav rate -v $(sample_rate)
+	avconv -i $^ -f sox - | sox -t sox - -c 1 -b 16 build/audio/base/$*.wav rate -v $(sample_rate)
+#	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -b 16 build/audio/base/$*.wav rate -v $(sample_rate)
 
 # Speaker diarization
 build/diarization/%/$(SEGMENTS): build/audio/base/%.wav
