@@ -192,15 +192,27 @@ build/trans/%/fbank: build/trans/%/spk2utt
 	date +%s%N | cut -b1-13
 
 
-### Decode with Eesen 
 # example target
 #	make build/trans/myvideo/eesen/decode/log
 build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 	rm -rf build/trans/$*/eesen && mkdir -p build/trans/$*/eesen
-#	(cd build/trans/$*/eesen; for f in $(MODEL_DIR)/*; do ln -s $$f; done)
+ifeq ($(MODELS),aspire.kaldi)
+	local/decode_nnet3.sh --cmd "$$decode_cmd" --nj $(njobs) \
+		--acwt $(ACWT) --post_decode_acwt 10.0 --beam $(BEAM) \
+		--lattice_beam 6.0 --max-active 7000 --skip_scoring true \
+		$(GRAPH_DIR) build/trans/$* `dirname $@` $(MODEL_DIR) || exit 1;
+else ifeq ($(MODELS),tedlium.eesen)	### Decode with Eesen 
 	local/decode_ctc_lat_phon.sh --cmd "$$decode_cmd" --nj $(njobs) --beam $(BEAM) \
 	--lattice_beam 8.0 --max-active 5000 --skip_scoring true \
 	--acwt $(ACWT) $(GRAPH_DIR) build/trans/$* `dirname $@` $(MODEL_DIR) || exit 1;
+else ifeq ($(MODELS,swbd.tf))
+        local/decode_ctc_lat_tf.sh --mdl $(MODEL_DIR)/dbr-run6/model/epoch18.ckpt --scoredir build/trans/$* \
+                --cmd "$$decode_cmd" --nj $(njobs) --beam $(BEAM) \
+                --lattice_beam 8.0 --max-active 5000 --skip_scoring true \
+                --acwt $(ACWT) --temperature 1.25 \
+                $(GRAPH_DIR) build/trans/$* `dirname $@` $(MODEL_DIR) || exit 1;
+endif
+
 
 # scoring can happen here now, get_ctm_conf.sh only scores if -f build/trans/$*/stm
 # produces confidence scores
@@ -209,7 +221,11 @@ build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
 %/decode/.ctm: %/decode/log
 #	local/get_ctm.sh `dirname $*` $*/graph $*/decode
 #	local/get_ctm_conf.sh `dirname $*` $*/graph $*/decode
+ifeq ($(MODELS),aspire.kaldi)
+	local/lattice_to_ctm_aspire.sh `dirname $*` $(GRAPH_DIR) $*/decode
+else
 	local/get_ctm_conf.sh `dirname $*` $(GRAPH_DIR) $*/decode
+endif
 	touch -m $@
 
 # % = myvideo/eesen
