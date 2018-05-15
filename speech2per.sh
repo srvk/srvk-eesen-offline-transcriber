@@ -37,6 +37,12 @@ hypbasename="${hypfilename%.*}"
 
 cp -u $2 $BASEDIR/src-audio
 
+# VERY IMPORTANT: clean up first
+rm -rf build/output/${basename}.*
+rm -rf build/trans/${basename}
+rm -rf build/audio/*/${basename}
+rm -rf build/diarization/${basename}
+
 nnet2_online_arg="DO_NNET2_ONLINE=no"
 
 (cd $BASEDIR; make build/output/${hypbasename%.*}.{txt,trs,ctm,sbv,srt,labels} || exit 1; if $clean ; then make .${hypbasename%.*}.clean; fi)
