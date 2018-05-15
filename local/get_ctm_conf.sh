@@ -37,7 +37,7 @@ dir=$3
 symtab=$lang_or_graph/words.txt
 
 # assume hubscr.pl is on $PATH
-#hubscr=$KALDI_ROOT/tools/sctk/bin/hubscr.pl
+hubscr=$KALDI_ROOT/tools/sctk/bin/hubscr.pl
 #[ ! -f $hubscr ] && echo "Cannot find scoring program at $hubscr" && exit 1;
 hubdir=`dirname $hubscr`
 
