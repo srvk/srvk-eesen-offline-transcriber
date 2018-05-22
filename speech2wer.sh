@@ -43,7 +43,7 @@ if [ $# -lt 1 ]; then
 fi
 
 ApplyGLM=false
-if [ "$3" != "" ] && [ -f $3 ]; then
+if [ "$2" != "" ] && [ -f $2 ]; then
     ApplyGLM=true
 else
     ApplyGLM=false
