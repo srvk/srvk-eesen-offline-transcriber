@@ -55,7 +55,7 @@ if [ $stage -le 0 ]; then
     lattice-scale --inv-acoustic-scale=LMWT "ark:gunzip -c $dir/lat.*.gz|" ark:- \| \
     lattice-add-penalty --word-ins-penalty=$word_ins_penalty ark:- ark:- \| \
     lattice-prune --beam=$beam ark:- ark:- \| \
-    lattice-to-ctm-conf --decode-mbr=$decode_mbr ark:- - \| \
+    lattice-to-ctm-conf --decode-mbr=$decode_mbr --frame-shift=0.03 ark:- - \| \
     utils/int2sym.pl -f 5 $lang/words.txt  \| tee $dir/score_LMWT/$name.utt.ctm \
     '>' $dir/score_LMWT/$name.ctm || exit 1;
 

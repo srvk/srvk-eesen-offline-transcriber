@@ -79,7 +79,8 @@ export
 
 build/audio/base/%.wav: src-audio/%.sph
 	mkdir -p `dirname $@`
-	sox $^ build/audio/base/$*.wav rate -v $(sample_rate) #channels 1
+	#sox $^ build/audio/base/$*.wav rate -v $(sample_rate) #channels 1
+	/data/ASR5/fmetze/kaldi-latest/tools/sph2pipe_v2.5/sph2pipe -f wav $^ | sox -t wav - -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.wav
 	mkdir -p `dirname $@`
@@ -92,8 +93,9 @@ build/audio/base/%.wav: src-audio/%.WAV
 build/audio/base/%.wav: src-audio/%.mp3
 	mkdir -p `dirname $@`
 #	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
-	lame --resample $(sample_rate) --decode $^ build/audio/base/$*.8k.wav
-	sox build/audio/base/$*.8k.wav -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+#	lame --resample $(sample_rate) --decode $^ build/audio/base/$*.8k.wav
+#	sox build/audio/base/$*.8k.wav -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	ffmpeg -loglevel warning -i $^ -f sox - | sox -t sox - -c 1 -b 16 -r $(sample_rate) $@
 
 build/audio/base/%.wav: src-audio/%.MP3
 	mkdir -p `dirname $@`
@@ -109,7 +111,11 @@ build/audio/base/%.wav: src-audio/%.mp2
 
 build/audio/base/%.wav: src-audio/%.wma
 	mkdir -p `dirname $@`
-	/data/ASR1/tools/ffmpeg-2.5.3/ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -b 16 -r $(sample_rate) $@
+	ffmpeg -loglevel warning -i $^ -f sox - | sox -t sox - -c 1 -b 16 -r $(sample_rate) $@
+
+build/audio/base/%.wav: src-audio/%.WMA
+	mkdir -p `dirname $@`
+	ffmpeg -loglevel warning -i $^ -f sox - | sox -t sox - -c 1 -b 16 -r $(sample_rate) $@
 
 build/audio/base/%.wav: src-audio/%.m4a
 	mkdir -p `dirname $@`
@@ -119,14 +125,15 @@ build/audio/base/%.wav: src-audio/%.m4a
 build/audio/base/%.wav: src-audio/%.mp4
 	mkdir -p `dirname $@`
 #	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
-	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@ 
+#	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@
+	ffmpeg -i $^ -f sox - | sox -t sox - -c 1 -b 16 $@ rate -v $(sample_rate)
 	echo "converted audio"
 	date +%s%N | cut -b1-13
 
 build/audio/base/%.wav: src-audio/%.MP4
 	mkdir -p `dirname $@`
 #	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
-	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@ 
+	avconv -i $^ -ac 1 -ar $(sample_rate) -y $@
 	echo "converted audio"
 	date +%s%N | cut -b1-13
 

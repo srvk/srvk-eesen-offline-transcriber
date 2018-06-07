@@ -39,10 +39,10 @@ if [ ! -z $nthreads ]; then
   echo "Using $nthreads threads for decoding"
   nthreads_arg="nthreads=$nthreads"
 fi
-  
+
 cp -u $1 $BASEDIR/src-audio
 
-makefile="aspire.Makefile"
+makefile="Makefile.aspire"
 
 filename=$(basename "$1")
 basename="${filename%.*}"
