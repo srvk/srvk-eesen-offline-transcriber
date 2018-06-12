@@ -11,7 +11,6 @@ sbv=""
 srt=""
 clean=false
 nthreads=""
-nnet2_online=false
 
 . $BASEDIR/utils/parse_options.sh || exit 1;
 
@@ -28,7 +27,6 @@ if [ $# -ne 1 ]; then
   echo "  --srt <srt-file>      # Put the result in SRT file (subtitles)"
   echo "  --labels <lbl-file>   # Put the result in Audacity labels format"
   echo "  --clean (true|false)  # Delete intermediate files generated during decoding (true by default)"
-  echo "  --nnet2-online (true|false) # Use one-pass decoding using online nnet2 models. 3 times faster, 10% relatively more errors (false by default)"
   exit 1;
 fi
 
@@ -36,30 +34,25 @@ DIRNAME=$(dirname $1)
 
 nthreads_arg=""
 if [ ! -z $nthreads ]; then
-  echo "Using $nthreads threads for decoding"
   nthreads_arg="nthreads=$nthreads"
 fi
-
-cp -u $1 $BASEDIR/src-audio
 
 makefile="Makefile.aspire"
 
 filename=$(basename "$1")
 basename="${filename%.*}"
 
-nnet2_online_arg="DO_NNET2_ONLINE=no"
-if $nnet2_online; then
-  nnet2_online_arg="DO_NNET2_ONLINE=yes"
-fi
+[ -f $BASEDIR/src-audio/$filename ] || [ -L $BASEDIR/src-audio/$filename ] || (e=`readlink -f $1` && cd $BASEDIR/src-audio && ln -s $e .)
 
-(cd $BASEDIR; make -f ${makefile} $nthreads_arg $nnet2_online_arg build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels} || exit 1; if $clean ; then make -f ${makefile} .${basename%.*}.clean; fi)
+(cd $BASEDIR; make -f ${makefile} $nthreads_arg build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels} || exit 1; if $clean ; then make -f ${makefile} .${basename%.*}.clean; fi)
+#(cd $BASEDIR; make -f ${makefile} $nthreads_arg $nnet2_online_arg build/diarization/${basename%.*}/show.seg || exit 1; if $clean ; then make -f ${makefile} .${basename%.*}.clean; fi)
 
 # put phonetic transcription in output folder (not part of Makefile)
 #python local/readphonemes.py build/trans/${basename}/eesen/decode/phones.1.txt > build/output/${basename}.phones
 
-rm $BASEDIR/src-audio/$filename
-
 echo "Finished transcribing, result is in files $BASEDIR/build/output/${basename%.*}.{txt,trs,ctm,sbv,srt,labels}"
+
+if $clean; then rm $BASEDIR/src-audio/$filename; fi
 
 if [ ! -z $txt ]; then
  cp $BASEDIR/build/output/${basename%.*}.txt $txt
@@ -85,4 +78,3 @@ fi
 if [ ! -z $labels ]; then
  cp $BASEDIR/build/output/${basename%.*}.labels $labels
 fi
-

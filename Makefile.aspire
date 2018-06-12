@@ -15,7 +15,7 @@ SID_THRESHOLD?=13
 #    show.seg       : default - final segmentation with NCLR/CE clustering
 #    show.i.seg     : initial segmentation (entire audio)
 #    show.pms.seg   : sPeech/Music/Silence segmentation (don't use)
-#    show.s.seg     : GLR based segmentation, make Small segments
+#    show.s.seg     : GLR based segmentation, make small segments
 #    show.l.seg     : linear clustering (merge only side by side segments)
 #    show.h.seg     : hierarchical clustering
 #    show.d.seg     : viterbi decoding
@@ -28,7 +28,8 @@ SID_THRESHOLD?=13
 SEGMENTS ?= show.seg
 
 # Where is Kaldi root directory?
-KALDI_ROOT?=~/eesen
+EESEN_ROOT ?= ~/eesen
+KALDI_ROOT ?=../kaldi
 
 GRAPH_DIR?=$(EESEN_ROOT)/asr_egs/tedlium/v1/data/lang_phn_test
 MODEL_DIR?=$(EESEN_ROOT)/asr_egs/tedlium/v1/exp/train_phn_l5_c320
@@ -139,7 +140,7 @@ build/audio/base/%.wav: src-audio/%.MP4
 
 build/audio/base/%.wav: src-audio/%.flac
 	mkdir -p `dirname $@`
-	sox $^ -c 1 build/audio/base/$*.wav rate -v $(sample_rate)
+	flac -s -d -c $^ | sox -t wav - -c 1 -b 16 build/audio/base/$*.wav rate -v $(sample_rate)
 
 build/audio/base/%.wav: src-audio/%.amr
 	mkdir -p `dirname $@`
@@ -198,17 +199,32 @@ build/trans/%/spk2utt: build/trans/%/utt2spk
 #   note the % pattern matches e.g. myvideo
 build/trans/%/fbank: build/trans/%/spk2utt
 	rm -rf $@ build/trans/$*/cmvn.scp
-	steps/$(fbank).sh --fbank-config conf/fbank.$(sample_rate).conf --cmd "$$train_cmd" --nj 1 \
+	steps/$(fbank).sh --fbank-config conf/fbank.$(sample_rate).conf --cmd "$$train_cmd" --nj $(njobs) \
 		build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
-	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1
-	echo "feature generation done"
-	date +%s%N | cut -b1-13
+	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_fbank $@ || exit 1;
+
+# Hires MFCC calculation
+build/trans/%/mfcc_hires: build/trans/%/spk2utt
+	rm -rf $@ build/trans/$*/cmvn.scp
+	steps/make_mfcc.sh --mfcc-config conf/mfcc_hires.conf --cmd "$$train_cmd" --nj $(njobs) \
+		build/trans/$* build/trans/$*/exp/make_mfcc_hires $@ || exit 1
+	steps/compute_cmvn_stats.sh build/trans/$* build/trans/$*/exp/make_mfcc_hires $@ || exit 1;
+
+# i-vectors for adapted Aspire model and training
+#     this should not be hardcoded in this way, but well ...
+aspireivectordir=/data/ASR5/sdalmia_1/spring2018/kaldi/kaldi/egs/aspire/s5_orig
+build/trans/%/ivectors: build/trans/%/mfcc_hires
+	steps/online/nnet2/extract_ivectors.sh --cmd "$$train_cmd" --nj $(njobs) --silence-weight 0.00001 \
+		--sub-speaker-frames 6000 --max-count 75 \
+		build/trans/$* "$$aspireivectordir"/data/lang \
+		"$$aspireivectordir"/exp/tdnn_7b_chain_online/ivector_extractor build/trans/$*/exp/make_ivectors || exit 1;
+
 
 # Decode
 # example target
 #	make build/trans/myvideo/eesen/decode/log
-build/trans/%/eesen/decode/log: build/trans/%/spk2utt build/trans/%/fbank
-	rm -rf build/trans/$*/eesen && mkdir -p build/trans/$*/eesen
+build/trans/%/$(FINAL_PASS)/decode/log: build/trans/%/spk2utt build/trans/%/fbank
+	rm -rf build/trans/$*/$(FINAL_PASS) && mkdir -p build/trans/$*/$(FINAL_PASS)
 #	(cd build/trans/$*/eesen; for f in $(MODEL_DIR)/*; do ln -s $$f; done)
 ifeq ($(MODELS),aspire.kaldi)
 	local/decode_nnet3.sh --cmd "$$decode_cmd" --nj $(njobs) \
@@ -290,8 +306,6 @@ endif
 build/output/%.trs: build/trans/%/$(FINAL_PASS).trs	
 	mkdir -p `dirname $@`
 	cp $^ $@
-	echo "final output done"
-	date +%s%N | cut -b1-13
 
 build/output/%.ctm: build/trans/%/$(FINAL_PASS).ctm 
 	mkdir -p `dirname $@`

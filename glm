@@ -1,2 +1,122 @@
-;; empty.glm
-  [FAKE]     =>  %HESITATION     / [ ] __ [ ] ;; hesitation token
+;; Special contractions
+AIN'T            => [ARE NOT] / [ ] __ [ ]
+'CAUSE           => BECAUSE ;; per AHD
+C'MON            => [COME ON] / [ ] __ [ ]
+'EM              => THEM ;; per AHD
+GONNA            => GOING TO ;; ISIP doc
+GOTTA            => GOT TO ;; ISIP doc
+KINDA            => KIND OF ;; ISIP Doc
+MA'AM            => [MAM] / [ ] __ [ ]
+OUGHTA           => OUGHT TO ;; ISIP Doc.
+'TIL             => TILL ;; not exactly per AHD, but common
+WANNA            => WANT TO ;; ISIP doc
+
+;; Alternate acceptable spellings
+ADVISER            => ADVISOR / [ ] __  ;; actually, "adviser' is preferred, but doing it this way avoids misspelling "advisory":
+;; which is proper:
+BAGDAD             => BAGHDAD ;; per AHD
+;;
+15 => FIFTEEN
+BMI => B._M._I.
+1 => ONE
+2 => TWO
+3 => THREE
+4 => FOUR
+5 => FIVE
+6 => SIX
+7 => SEVEN
+8 => EIGHT
+9 => NINE
+10 => TEN
+20 => TWENTY
+30 => THIRTY
+
+;; One-to-three-word compound word expansions
+ANTIAIRCRAFT      => ANTI AIR CRAFT   / [ ] __ [ ]
+
+
+;; One-to-two-word compound word expansions
+AFTERALL          => AFTER ALL        / [ ] __ [ ]
+
+;; Contraction expansions without probable possessive alternatives
+[AREN'T] => [ARE NOT] / [ ] __ [ ]
+[CAN'T] => [{CAN NOT / CANNOT}] / [ ] __ [ ]
+[COULDN'T] => [COULD NOT] / [ ] __ [ ]
+[COULD'VE] => [COULD HAVE] / [ ] __ [ ]
+[DIDN'T] => [DID NOT] / [ ] __ [ ]
+[DOESN'T] => [DOES NOT] / [ ] __ [ ]
+[DON'T] => [DO NOT] / [ ] __ [ ]
+[HADN'T] => [HAD NOT] / [ ] __ [ ]
+[HASN'T] => [HAS NOT] / [ ] __ [ ]
+[HAVEN'T] => [HAVE NOT] / [ ] __ [ ]
+[HE'D] => [{HE HAD / HE WOULD}] / [ ] __ [ ]
+[HE'LL] => [HE WILL] / [ ] __ [ ]
+[HE'S] => [{HE IS / HE HAS}] / [ ] __ [ ]
+[HOW'D] => [{HOW HAD / HOW WOULD / HOW DID}] / [ ] __ [ ]
+[HOW'S] => [{HOW IS / HOW HAS / HOW DOES}] / [ ] __ [ ]
+[HUCKELBY'LL] => [HUCKELBY WILL] / [ ] __ [ ]
+[I'D] => [{I HAD / I WOULD}] / [ ] __ [ ]
+[I'LL] => [I WILL] / [ ] __ [ ]
+[I'M] => [I AM] / [ ] __ [ ]
+[ISN'T] => [IS NOT] / [ ] __ [ ]
+[IT'D] => [{IT HAD / IT WOULD}] / [ ] __ [ ]
+[IT'LL] => [IT WILL] / [ ] __ [ ]
+[I'VE] => [I HAVE] / [ ] __ [ ]
+[LET'S] => [LET US] / [ ] __ [ ]
+[MUST'VE] => [MUST HAVE] / [ ] __ [ ]
+[SHE'D] => [{SHE HAD / SHE WOULD}] / [ ] __ [ ]
+[SHE'LL] => [SHE WILL] / [ ] __ [ ]
+[SHE'S] => [{SHE IS / SHE HAS}] / [ ] __ [ ]
+[SHOULDN'T] => [SHOULD NOT] / [ ] __ [ ]
+[SHOULD'VE] => [SHOULD HAVE] / [ ] __ [ ]
+[THAT'D] => [{THAT HAD / THAT WOULD}] / [ ] __ [ ]
+[THAT'LL] => [THAT WILL] / [ ] __ [ ]
+[THAT'RE] => [{THAT ARE / THAT WERE}] / [ ] __ [ ]
+[THAT'S] => [{THAT'S / THAT IS / THAT HAS}] / [ ] __ [ ]
+[THAT'VE] => [THAT HAVE] / [ ] __ [ ]
+[THERE'D] => [{THERE HAD / THERE WOULD}] / [ ] __ [ ]
+[THERE'LL] => [THERE WILL] / [ ] __ [ ]
+[THERE'RE] => [{THERE ARE / THERE WERE}] / [ ] __ [ ]
+[THERE'S] => [{THERE'S / THERE IS / THERE HAS}] / [ ] __ [ ]
+[THERE'VE] => [THERE HAVE] / [ ] __ [ ]
+[THEY'D] => [{THEY HAD / THEY WOULD}] / [ ] __ [ ]
+[THEY'LL] => [THEY WILL] / [ ] __ [ ]
+[THEY'RE] => [{THEY ARE / THEY WERE}] / [ ] __ [ ]
+[THEY'VE] => [THEY HAVE] / [ ] __ [ ]
+[THIS'LL] => [THIS WILL] / [ ] __ [ ]
+[WASN'T] => [WAS NOT] / [ ] __ [ ]
+[WE'D] => [{WE HAD / WE WOULD}] / [ ] __ [ ]
+[WE'LL] => [WE WILL] / [ ] __ [ ]
+[WE'VE] => [WE HAVE] / [ ] __ [ ]
+[WHAT'RE] => [{WHAT ARE / WHAT WERE}] / [ ] __ [ ]
+[WHERE'RE] => [{WHERE ARE / WHERE WERE}] / [ ] __ [ ]
+[WHO'D] => [{WHO HAD / WHO WOULD}] / [ ] __ [ ]
+[WHO'LL] => [WHO WILL] / [ ] __ [ ]
+[WHO'VE] => [WHO HAVE] / [ ] __ [ ]
+[WON'T] => [WILL NOT] / [ ] __ [ ]
+[WOULDN'T] => [WOULD NOT] / [ ] __ [ ]
+[WOULD'VE] => [WOULD HAVE] / [ ] __ [ ]
+[YOU'D] => [{YOU HAD / YOU WOULD}] / [ ] __ [ ]
+[YOU'LL] => [YOU WILL] / [ ] __ [ ]
+[YOU'RE] => [{YOU ARE / YOU WERE}] / [ ] __ [ ]
+[YOU'VE] => [YOU HAVE] / [ ] __ [ ]
+DON'TS    => [DO NOTS] / [ ] __ [ ]
+WHY'D     => [{WHY DID / WHY WOULD}] / [ ] __ [ ]
+;; Added for Eval RT02s
+[Y'ALL]     => [YOU ALL] / [ ] __ [ ]
+[WHO'RE]    => [{WHO ARE / WHO WERE}] / [ ] __ [ ]
+[MIGHT'VE] => [MIGHT HAVE] / [ ] __ [ ]
+
+;; Probably possessives, but also allow to-be and to-have verb form contraction expansion
+
+
+;; More changes specifically for conversations
+[WE'RE] => [{WE ARE / WE WERE}] / [ ] __ [ ]
+[WEREN'T] => [WERE NOT] / [ ] __ [ ]
+[WHAT'S] => [{WHAT IS / WHAT HAS / WHAT DOES}] / [ ] __ [ ]
+[WHEN'S] => [{WHEN IS / WHEN HAS / WHEN DOES}] / [ ] __ [ ]
+[WHERE'S] => [{WHERE IS / WHERE HAS / WHERE DOES}] / [ ] __ [ ]
+[WHO'S] => [{WHO'S / WHO IS / WHO HAS}] / [ ] __ [ ]
+[WHY'S] => [{WHY IS / WHY HAS / WHY DOES}] / [ ] __ [ ]
+
+;; END of GLM file

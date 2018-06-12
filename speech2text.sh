@@ -42,6 +42,12 @@ fi
   
 cp -u $1 $BASEDIR/src-audio
 
+# VERY IMPORTANT: clean up first
+rm -rf build/output/${basename}.*
+rm -rf build/trans/${basename}
+rm -rf build/audio/*/${basename}
+rm -rf build/diarization/${basename}
+
 filename=$(basename "$1")
 basename="${filename%.*}"
 
